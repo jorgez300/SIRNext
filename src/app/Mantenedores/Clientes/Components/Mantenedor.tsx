@@ -40,7 +40,9 @@ type MantenedorClienteProps = {
   cliente?: Cliente;
 };
 
-export default function MantenedorCliente(props: Readonly<MantenedorClienteProps>) {
+export default function MantenedorCliente(
+  props: Readonly<MantenedorClienteProps>
+) {
   const form = useForm<z.infer<typeof MantenedorClienteSchema>>({
     resolver: zodResolver(MantenedorClienteSchema),
     defaultValues: MantenedorClienteDefault,
@@ -60,7 +62,7 @@ export default function MantenedorCliente(props: Readonly<MantenedorClienteProps
     form.trigger();
     if (form.formState.isValid) {
       const NewItem: Cliente = {
-        Id: (props.cliente) ? props.cliente.Id : undefined,
+        Id: props.cliente ? props.cliente.Id : undefined,
         Identificacion: form.getValues("Identificacion"),
         Nombre: form.getValues("Nombre"),
       };

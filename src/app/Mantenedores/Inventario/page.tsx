@@ -3,43 +3,46 @@ import { Button } from "@/components/ui/button";
 
 import { ArrowUpDown, PlusIcon, Edit2Icon, Trash2Icon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { TablaClientes } from "./Components/Tabla";
+import { TablaInventario } from "./Components/Tabla";
 
 import { ColumnDef } from "@tanstack/react-table";
 
-import MantenedorLink from "./Components/Mantenedor";
-import { Cliente } from "@/domain/Models/Clientes/Cliente";
-import { GetClienteById, GetClientes } from "@/domain/Services/ClienteService";
-import FiltrosCliente from "./Components/Filtros";
-import { FiltroCliente } from "@/domain/DTOs/FiltroClientes";
+import { Inventario } from "@/domain/Models/Inventario/Inventario";
+import { FiltroInventario } from "@/domain/DTOs/FiltroInventario";
+import FiltrosInventario from "./Components/Filtros";
+import MantenedorInventario from "./Components/Mantenedor";
+import {
+  GetInventario,
+  GetInventarioById,
+} from "@/domain/Services/InventarioService";
 
-export default function ClientesPage() {
+export default function InventarioPage() {
   const [date, setDate] = useState<Date | undefined>();
   const [open, setOpen] = useState(false);
-  const [listaClientes, setListaClientes] = useState<Cliente[]>([]);
-  const [cliente, setCliente] = useState<Cliente | undefined>();
+  const [listaInventario, setListaInventario] = useState<Inventario[]>([]);
+  const [inventario, setInventario] = useState<Inventario | undefined>();
 
   useEffect(() => {
     Buscar();
   }, []);
 
-  const Buscar = (filtro?: FiltroCliente) => {
-    GetClientes(filtro).then((result) => {
-      setListaClientes(result);
+  const Buscar = (filtro?: FiltroInventario) => {
+    GetInventario(filtro).then((result) => {
+      setListaInventario(result);
     });
   };
 
   const ModalVisible = (flag: boolean, id?: string | undefined) => {
     if (!flag) {
-      setCliente(undefined);
+      setInventario(undefined);
       setOpen(flag);
     }
     if (id == undefined) {
-      setCliente(undefined);
+      setInventario(undefined);
       setOpen(flag);
     } else {
-      GetClienteById(id).then((result) => {
-        setCliente(result);
+      GetInventarioById(id).then((result) => {
+        setInventario(result);
         setOpen(flag);
       });
     }
@@ -49,41 +52,63 @@ export default function ClientesPage() {
     setDate(fecha);
   };
 
-  const columns: ColumnDef<Cliente>[] = [
+  const columns: ColumnDef<Inventario>[] = [
     {
-      accessorKey: "Identificacion",
-      header: "Identificacion",
-    },
-    {
-      accessorKey: "Nombre",
+      accessorKey: "Codigo",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Nombre
+            Codigo
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
       },
     },
     {
+      accessorKey: "Descripcion",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Descripcion
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        );
+      },
+    },
+    {
+      accessorKey: "Existencia",
+      header: "Existencia",
+    },
+    {
+      accessorKey: "Costo",
+      header: "Costo",
+    },
+    {
+      accessorKey: "Precio",
+      header: "Precio",
+    },
+    {
       header: "Acciones",
       cell: ({ row }) => {
-        const cliente = row.original;
+        const inventario = row.original;
         return (
           <div className="grid grid-cols-2 gap-3 w-52">
             <Edit2Icon
               className="text-teal-600"
               onClick={() => {
-                ModalVisible(true, cliente.Id);
+                ModalVisible(true, inventario.Id);
               }}
             />
             <Trash2Icon
               className="text-teal-600"
               onClick={() => {
-                alert(cliente.Id);
+                alert(inventario.Id);
               }}
             />
           </div>
@@ -107,17 +132,17 @@ export default function ClientesPage() {
       </div>
 
       <div>
-        <FiltrosCliente Buscar={Buscar} />
+        <FiltrosInventario Buscar={Buscar} />
       </div>
       <div className="w-full">
-        <TablaClientes columns={columns} data={listaClientes} />
+        <TablaInventario columns={columns} data={listaInventario} />
       </div>
-      <MantenedorLink
+      <MantenedorInventario
         open={open}
         setOpen={ModalVisible}
         setDate={SaveDate}
         date={date}
-        cliente={cliente}
+        inventario={inventario}
       />
     </main>
   );

@@ -5,7 +5,9 @@ import Link from "next/link";
 import {
   User,
   Handshake,
-  Wrench
+  Wrench,
+  Package2,
+  Receipt
 } from "lucide-react";
 
 import {
@@ -64,7 +66,20 @@ export default function RootLayout({
                       <Handshake className="h-5 w-5" />
                       Clientes
                     </Link>
-
+                    <Link
+                      href="/Mantenedores/Inventario"
+                      className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                    >
+                      <Package2 className="h-5 w-5" />
+                      Inventario
+                    </Link>
+                    <Link
+                      href="/Operaciones/Ventas"
+                      className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                    >
+                      <Receipt className="h-5 w-5" />
+                      Ventas
+                    </Link>
                   </nav>
                 </SheetContent>
               </Sheet>

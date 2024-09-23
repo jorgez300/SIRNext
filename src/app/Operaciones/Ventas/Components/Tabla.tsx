@@ -1,15 +1,8 @@
 "use client";
 import * as React from "react";
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  useReactTable,
-  SortingState,
-  getSortedRowModel,
-  VisibilityState,
-} from "@tanstack/react-table";
+import { ColumnDef, flexRender } from "@tanstack/react-table";
+
+import { Table as TsTable } from "@tanstack/react-table";
 
 import {
   Table,
@@ -20,38 +13,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { TablaPaginacion } from "@/app/global/Components/Tabla.Paginacion";
-import { TablaEditorColumnas } from "@/app/global/Components/Tabla.EditorColumnas";
-
-interface TablaClientesProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+interface TablaItemsVentaProps<TData> {
+  columns: ColumnDef<TData>[];
+  table: TsTable<TData>;
 }
 
-export function TablaClientes<TData, TValue>({
+export function TablaItemsVenta<TData>({
   columns,
-  data,
-}: Readonly<TablaClientesProps<TData, TValue>>) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    state: {
-      sorting,
-      columnVisibility,
-    },
-  });
-
+  table,
+}: Readonly<TablaItemsVentaProps<TData>>) {
   return (
     <div className="rounded-md border">
-      <TablaEditorColumnas table={table} />
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -94,7 +66,6 @@ export function TablaClientes<TData, TValue>({
           )}
         </TableBody>
       </Table>
-      <TablaPaginacion table={table} />
     </div>
   );
 }

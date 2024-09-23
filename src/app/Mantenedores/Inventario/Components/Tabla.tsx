@@ -23,15 +23,15 @@ import {
 import { TablaPaginacion } from "@/app/global/Components/Tabla.Paginacion";
 import { TablaEditorColumnas } from "@/app/global/Components/Tabla.EditorColumnas";
 
-interface TablaClientesProps<TData, TValue> {
+interface TablaInventarioProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export function TablaClientes<TData, TValue>({
+export function TablaInventario<TData, TValue>({
   columns,
   data,
-}: Readonly<TablaClientesProps<TData, TValue>>) {
+}: Readonly<TablaInventarioProps<TData, TValue>>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
