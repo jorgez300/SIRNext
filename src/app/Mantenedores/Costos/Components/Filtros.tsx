@@ -14,26 +14,24 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { SearchCheckIcon } from "lucide-react";
-import { FiltroInventario } from "@/domain/DTOs/FiltroInventario";
-import {
-  FiltroInventarioDefault,
-  FiltroInventarioSchema,
-} from "../Schemas/FiltroInventario.schema";
+import { FiltroCosto } from "@/domain/DTOs/FiltroCosto";
+import { FiltroCostoSchema, FiltroCostoDefault } from "../Schemas/FiltroCosto.schema";
 
-type FiltroInventarioProps = {
-  Buscar: (filtros: FiltroInventario) => void;
+
+type FiltroCostoProps = {
+  Buscar: (filtros: FiltroCosto) => void;
 };
 
-export default function FiltrosInventario(props: Readonly<FiltroInventarioProps>) {
-  const form = useForm<z.infer<typeof FiltroInventarioSchema>>({
-    resolver: zodResolver(FiltroInventarioSchema),
-    defaultValues: FiltroInventarioDefault,
+export default function FiltrosCosto(props: Readonly<FiltroCostoProps>) {
+  const form = useForm<z.infer<typeof FiltroCostoSchema>>({
+    resolver: zodResolver(FiltroCostoSchema),
+    defaultValues: FiltroCostoDefault,
   });
 
   function handleSubmit() {
     form.trigger();
     if (form.formState.isValid) {
-      const NewItem: FiltroInventario = {
+      const NewItem: FiltroCosto = {
         Codigo: form.getValues("Codigo"),
         Descripcion: form.getValues("Descripcion"),
       };

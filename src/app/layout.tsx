@@ -80,6 +80,20 @@ export default function RootLayout({
                       <Receipt className="h-5 w-5" />
                       Ventas
                     </Link>
+                    <Link
+                      href="/Tablero/Resumen"
+                      className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                    >
+                      <Handshake className="h-5 w-5" />
+                      Tablero Resumen
+                    </Link>
+                    <Link
+                      href="/Mantenedores/Costos"
+                      className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                    >
+                      <Handshake className="h-5 w-5" />
+                      Costos
+                    </Link>
                   </nav>
                 </SheetContent>
               </Sheet>

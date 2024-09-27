@@ -120,7 +120,7 @@ export default function MantenedorInventario(
                 control={form.control}
                 name="Descripcion"
                 render={({ field }) => (
-                  <FormItem className="col-span-4 ">
+                  <FormItem className="col-span-4">
                     <FormLabel>Descripcion</FormLabel>
                     <FormControl>
                       <Input placeholder="Descripcion" {...field} />
@@ -133,7 +133,7 @@ export default function MantenedorInventario(
                 control={form.control}
                 name="Existencia"
                 render={({ field }) => (
-                  <FormItem className="col-span-4 ">
+                  <FormItem className=" ">
                     <FormLabel>Existencia</FormLabel>
                     <FormControl>
                       <Input placeholder="Existencia" {...field} />
@@ -146,7 +146,7 @@ export default function MantenedorInventario(
                 control={form.control}
                 name="Costo"
                 render={({ field }) => (
-                  <FormItem className="col-span-4 ">
+                  <FormItem className=" ">
                     <FormLabel>Costo</FormLabel>
                     <FormControl>
                       <Input placeholder="Costo" {...field} />
@@ -159,7 +159,7 @@ export default function MantenedorInventario(
                 control={form.control}
                 name="Precio"
                 render={({ field }) => (
-                  <FormItem className="col-span-4 ">
+                  <FormItem className=" ">
                     <FormLabel>Precio</FormLabel>
                     <FormControl>
                       <Input placeholder="Precio" {...field} />
@@ -172,7 +172,7 @@ export default function MantenedorInventario(
                 control={form.control}
                 name="Minimo"
                 render={({ field }) => (
-                  <FormItem className="col-span-4 ">
+                  <FormItem className=" ">
                     <FormLabel>Minimo</FormLabel>
                     <FormControl>
                       <Input placeholder="Minimo" {...field} />
@@ -185,7 +185,7 @@ export default function MantenedorInventario(
                 control={form.control}
                 name="Maximo"
                 render={({ field }) => (
-                  <FormItem className="col-span-4 ">
+                  <FormItem className=" ">
                     <FormLabel>Maximo</FormLabel>
                     <FormControl>
                       <Input placeholder="Maximo" {...field} />
