@@ -13,8 +13,8 @@ type CameraProps = {
   disableFlip?: boolean;
   verbose?: boolean;
   qrCodeSuccessCallback?: (
-    decodedText: string,
-    decodedResult: string
+    decodedText: unknown,
+    decodedResult: unknown
   ) => void;
 };
 
