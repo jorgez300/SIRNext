@@ -7,7 +7,8 @@ import {
   Handshake,
   Wrench,
   Package2,
-  Receipt
+  Receipt,
+  Camera
 } from "lucide-react";
 
 import {
@@ -93,6 +94,20 @@ export default function RootLayout({
                     >
                       <Handshake className="h-5 w-5" />
                       Costos
+                    </Link>
+                    <Link
+                      href="/Escaner/Demo1"
+                      className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                    >
+                      <Camera className="h-5 w-5" />
+                      Escaner 1
+                    </Link>
+                    <Link
+                      href="/Escaner/Demo2"
+                      className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                    >
+                      <Camera className="h-5 w-5" />
+                      Escaner 2
                     </Link>
                   </nav>
                 </SheetContent>
