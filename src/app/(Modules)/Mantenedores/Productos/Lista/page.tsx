@@ -1,30 +1,38 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, PlusIcon, Edit2Icon, Trash2Icon } from "lucide-react";
+import {
+  ArrowUpDown,
+  PlusIcon,
+  Edit2Icon,
+  Trash2Icon,
+  Camera,
+} from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 
 import { FiltroProducto } from "@/domain/DTOs/Productos/FiltroProducto";
-import { ProductoCompleto } from "@/domain/DTOs/Productos/ProductoCompleto";
 import { Producto } from "@/domain/Models/Productos/Producto";
 import {
-  GetProductoCompletoById,
   GetProductos,
 } from "@/domain/Services/ProductoService";
-import FiltrosProducto from "./Components/Filtros";
-import MantenedorProducto from "./Components/Mantenedor";
-import { TablaProducto } from "./Components/Tabla";
+
 import { ModelosPorMarca } from "@/domain/DTOs/Vehiculos/ModelosPorMarca.Dto";
 import { GetModelosPorMarca } from "@/domain/Services/VehiculoService";
+import FiltrosProducto from "./Components/Filtros";
+import { TablaProducto } from "./Components/Tabla";
+import { useRouter } from 'next/navigation'
+import { EscanerProducto } from "@/app/global/Components/Camara";
 
 export default function ProductoPage() {
-  const [date, setDate] = useState<Date | undefined>();
-  const [open, setOpen] = useState(false);
   const [listaModelosPorMarca, setListaModelosPorMarca] = useState<
     ModelosPorMarca[]
   >([]);
   const [listaProducto, setListaProducto] = useState<Producto[]>([]);
-  const [producto, setProducto] = useState<ProductoCompleto | undefined>();
+
+  const [camaraActiva, setCamaraActiva] = useState<boolean>(false);
+  const [decodedText, setDecodedText] = useState<string>();
+
+  const router = useRouter()
 
   useEffect(() => {
     Buscar();
@@ -41,24 +49,15 @@ export default function ProductoPage() {
   const Listas = async () => {
     setListaModelosPorMarca(await GetModelosPorMarca());
   };
-  const ModalVisible = (flag: boolean, id?: string | undefined) => {
-    if (!flag) {
-      setProducto(undefined);
-      setOpen(flag);
-    }
-    if (id == undefined) {
-      setProducto(undefined);
-      setOpen(flag);
-    } else {
-      GetProductoCompletoById(id).then((result) => {
-        setProducto(result);
-        setOpen(flag);
-      });
-    }
-  };
 
-  const SaveDate = (fecha: Date | undefined) => {
-    setDate(fecha);
+  const Administrar = (id?: string) => {
+    if (id) {
+      console.log("Editar", id);
+    } else {
+      console.log("Crear");
+    }
+
+    router.push('/Mantenedores/Productos/Administrar')
   };
 
   const columns: ColumnDef<Producto>[] = [
@@ -111,7 +110,7 @@ export default function ProductoPage() {
             <Edit2Icon
               className="text-teal-600"
               onClick={() => {
-                ModalVisible(true, item.Id);
+                Administrar(item.Id);
               }}
             />
             <Trash2Icon
@@ -131,29 +130,37 @@ export default function ProductoPage() {
       <main className="grid grid-cols-1 gap-3 p-4">
         <div className="flex justify-end">
           <Button
-            className="bg-teal-600"
+            className="bg-teal-600 ml-2"
             onClick={() => {
-              setOpen(true);
+              Administrar();
             }}
           >
             <PlusIcon className="mr-2" />
             Agregar
           </Button>
+          <Button
+            className="bg-teal-600 ml-2"
+            onClick={() => {
+              setCamaraActiva(true);
+              setDecodedText("");
+            }}
+          >
+            <Camera className="mr-2" />
+            Camara
+          </Button>
         </div>
 
         <div>
-          <FiltrosProducto Buscar={Buscar} />
+          <FiltrosProducto decodedText={decodedText} Buscar={Buscar} listaModelosPorMarca={listaModelosPorMarca}/>
         </div>
         <div className="w-full">
           <TablaProducto columns={columns} data={listaProducto} />
         </div>
-        <MantenedorProducto
-          open={open}
-          setOpen={ModalVisible}
-          setDate={SaveDate}
-          date={date}
-          producto={producto}
-          listaModelosPorMarca={listaModelosPorMarca}
+        <EscanerProducto
+          camaraActiva={camaraActiva}
+          setCamaraActiva={setCamaraActiva}
+          decodedText={decodedText}
+          setDecodedText={setDecodedText}
         />
       </main>
     </Suspense>

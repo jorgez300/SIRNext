@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { GuardaArchivo, RetornaArchivo } from "@/domain/Helpers/ArchivosHelper";
+import { RetornaArchivo } from "@/domain/Helpers/ArchivosHelper";
 
 export default function SubirArchivoPage() {
   const [imageSrc, setImageSrc] = useState<string>("");
@@ -18,8 +18,8 @@ export default function SubirArchivoPage() {
 
   const ObtieneImagenDefault = () => {
     RetornaArchivo("TypeScript Types.png").then((result) => {
-        console.log('RetornaArchivo',result);
-        setImageSrc(result);
+      console.log("RetornaArchivo", result);
+      setImageSrc(result);
     });
   };
 
@@ -29,7 +29,7 @@ export default function SubirArchivoPage() {
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = reader.result as string;
-        
+
         setImageSrc(base64String);
         //GuardaArchivo(base64String, file.name);
       };
@@ -45,7 +45,7 @@ export default function SubirArchivoPage() {
       reader.onerror = () => console.log("file reading has failed");
       reader.onloadend = () => {
         const base64String = reader.result as string;
-        console.log('GuardaArchivo',base64String);
+        console.log("GuardaArchivo", base64String);
         setImageSrc2(base64String);
         //GuardaArchivo(base64String, file.name);
       };

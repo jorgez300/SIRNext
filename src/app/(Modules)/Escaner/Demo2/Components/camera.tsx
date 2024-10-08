@@ -12,10 +12,7 @@ type CameraProps = {
   aspectRatio?: number;
   disableFlip?: boolean;
   verbose?: boolean;
-  qrCodeSuccessCallback?: (
-    decodedText: unknown,
-    decodedResult: unknown
-  ) => void;
+  qrCodeSuccessCallback?: (decodedText: string, decodedResult: unknown) => void;
 };
 
 // Creates the configuration object for Html5QrcodeScanner.
@@ -39,6 +36,8 @@ const createConfig = (props: CameraProps) => {
 };
 
 const Html5QrcodePlugin = (props: CameraProps) => {
+
+  
   useEffect(() => {
     // when component mounts
     const config = createConfig(props);
@@ -64,7 +63,11 @@ const Html5QrcodePlugin = (props: CameraProps) => {
     };
   }, []);
 
-  return <div id={qrcodeRegionId} />;
+  return (
+    <>
+      <div id={qrcodeRegionId} />
+    </>
+  );
 };
 
 export default Html5QrcodePlugin;

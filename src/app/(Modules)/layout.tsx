@@ -55,11 +55,11 @@ export default function RootLayout({
                       Clientes
                     </Link>
                     <Link
-                      href="/Mantenedores/Productos"
+                      href="/Mantenedores/Productos/Lista"
                       className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                     >
                       <Package2 className="h-5 w-5" />
-                      Productos
+                      Lista Productos
                     </Link>
                     <Link
                       href="/Operaciones/Ventas"
