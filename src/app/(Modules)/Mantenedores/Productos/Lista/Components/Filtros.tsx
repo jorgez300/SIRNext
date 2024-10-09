@@ -57,8 +57,9 @@ export default function FiltrosProducto(props: Readonly<FiltroProductoProps>) {
           Codigo: form.getValues("Codigo"),
           Descripcion: form.getValues("Descripcion"),
           Modelo: modeloSeleccionado,
-          Marca: marcaSeleccionada
+          Marca: marcaSeleccionada,
         };
+        console.log("NewItem", NewItem);
         props.Buscar(NewItem);
       }
     });
@@ -66,6 +67,8 @@ export default function FiltrosProducto(props: Readonly<FiltroProductoProps>) {
 
   const handleLimpiar = async () => {
     form.reset();
+    setMarcaSeleccionada("");
+    setModeloSeleccionado("");
   };
 
   function FiltraModelos() {
@@ -74,10 +77,10 @@ export default function FiltrosProducto(props: Readonly<FiltroProductoProps>) {
     } else {
       const modelos: ModelosPorMarca[] | undefined =
         props.listaModelosPorMarca?.filter((item) => {
-          return item.Brand == marcaSeleccionada;
+          return item.Marca == marcaSeleccionada;
         });
 
-      return modelos![0].Models.map((item) => {
+      return modelos![0].Modelos.map((item) => {
         return (
           <SelectItem key={item} value={item}>
             {item}
@@ -122,6 +125,7 @@ export default function FiltrosProducto(props: Readonly<FiltroProductoProps>) {
               <div className="space-y-2">
                 <Label htmlFor="Marca">Marca</Label>
                 <Select
+                  value={marcaSeleccionada}
                   onValueChange={(e) => {
                     console.log("e", e);
                     setMarcaSeleccionada(e);
@@ -138,8 +142,8 @@ export default function FiltrosProducto(props: Readonly<FiltroProductoProps>) {
                       <SelectLabel>Marcas</SelectLabel>
                       {props.listaModelosPorMarca?.map((item) => {
                         return (
-                          <SelectItem key={item.Brand} value={item.Brand}>
-                            {item.Brand}
+                          <SelectItem key={item.Marca} value={item.Marca}>
+                            {item.Marca}
                           </SelectItem>
                         );
                       })}
@@ -150,6 +154,7 @@ export default function FiltrosProducto(props: Readonly<FiltroProductoProps>) {
               <div className="space-y-2">
                 <Label htmlFor="Modelo">Modelo</Label>
                 <Select
+                  value={modeloSeleccionado}
                   onValueChange={(e) => {
                     console.log("e", e);
                     setModeloSeleccionado(e);

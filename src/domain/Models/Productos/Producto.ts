@@ -1,7 +1,7 @@
 export type Producto = {
-    Id?: string;
     Codigo: string;
     Descripcion: string;
+    Vigente?: boolean;
     Existencia: number;
     Costo: number;
     Precio: number;

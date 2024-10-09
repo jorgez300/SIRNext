@@ -3,5 +3,5 @@ import { Vehiculo } from "@/domain/Models/Vehiculos/Vehiculo";
 
 export type ProductoCompleto = {
     Item?: Producto;
-    Marcas?: Vehiculo[]
+    Vehiculos?: Vehiculo[]
 }

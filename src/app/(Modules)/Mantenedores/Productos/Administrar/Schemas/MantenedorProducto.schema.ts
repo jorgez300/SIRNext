@@ -4,11 +4,12 @@ import { z } from "zod";
 export const MantenedorProductoSchema = z.object({
   Codigo: z
     .string({ required_error: "Requerido" })
-    .min(10, "Minimo 10 caracteres")
+    .min(2, "Minimo 2 caracteres")
     .max(50, "Maximo 50 caracteres"),
+  Vigente: z.boolean(),
   Descripcion: z
     .string({ required_error: "Requerido" })
-    .min(15, "Minimo 15 caracteres")
+    .min(2, "Minimo 2 caracteres")
     .max(100, "Maximo 50 caracteres"),
   Existencia: z.coerce.number().positive(),
   Costo: z.coerce
@@ -20,9 +21,9 @@ export const MantenedorProductoSchema = z.object({
 });
 
 export const MantenedorProductoDefault: Producto = {
-  Id: "",
   Codigo: "",
   Descripcion: "",
+  Vigente: true,
   Existencia: 0,
   Costo: 0,
   Precio: 0,

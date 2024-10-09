@@ -1,27 +1,20 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import {
-  ArrowUpDown,
-  PlusIcon,
-  Edit2Icon,
-  Trash2Icon,
-  Camera,
-} from "lucide-react";
+import { ArrowUpDown, PlusIcon, Edit2Icon, Camera } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 
 import { FiltroProducto } from "@/domain/DTOs/Productos/FiltroProducto";
 import { Producto } from "@/domain/Models/Productos/Producto";
-import {
-  GetProductos,
-} from "@/domain/Services/ProductoService";
+import { GetProductos } from "@/domain/Services/ProductoService";
 
 import { ModelosPorMarca } from "@/domain/DTOs/Vehiculos/ModelosPorMarca.Dto";
 import { GetModelosPorMarca } from "@/domain/Services/VehiculoService";
 import FiltrosProducto from "./Components/Filtros";
 import { TablaProducto } from "./Components/Tabla";
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 import { EscanerProducto } from "@/app/global/Components/Camara";
+import { useAdministraProductoStore } from "../Store/AdmistraProducto.store";
 
 export default function ProductoPage() {
   const [listaModelosPorMarca, setListaModelosPorMarca] = useState<
@@ -32,18 +25,18 @@ export default function ProductoPage() {
   const [camaraActiva, setCamaraActiva] = useState<boolean>(false);
   const [decodedText, setDecodedText] = useState<string>();
 
-  const router = useRouter()
+  const { RegistraCodigo, ResetCodigo } = useAdministraProductoStore();
+
+  const router = useRouter();
 
   useEffect(() => {
+    ResetCodigo();
     Buscar();
     Listas();
   }, []);
 
-  const Buscar = (filtro?: FiltroProducto) => {
-    //setListaProducto(await GetProductos(filtro))
-    GetProductos(filtro).then((result) => {
-      setListaProducto(result);
-    });
+  const Buscar = async (filtro?: FiltroProducto) => {
+    setListaProducto(await GetProductos(filtro))
   };
 
   const Listas = async () => {
@@ -51,13 +44,8 @@ export default function ProductoPage() {
   };
 
   const Administrar = (id?: string) => {
-    if (id) {
-      console.log("Editar", id);
-    } else {
-      console.log("Crear");
-    }
-
-    router.push('/Mantenedores/Productos/Administrar')
+    RegistraCodigo(id);
+    router.push(`/Mantenedores/Productos/Administrar`);
   };
 
   const columns: ColumnDef<Producto>[] = [
@@ -110,13 +98,7 @@ export default function ProductoPage() {
             <Edit2Icon
               className="text-teal-600"
               onClick={() => {
-                Administrar(item.Id);
-              }}
-            />
-            <Trash2Icon
-              className="text-teal-600"
-              onClick={() => {
-                alert(item.Id);
+                Administrar(item.Codigo);
               }}
             />
           </div>
@@ -151,7 +133,11 @@ export default function ProductoPage() {
         </div>
 
         <div>
-          <FiltrosProducto decodedText={decodedText} Buscar={Buscar} listaModelosPorMarca={listaModelosPorMarca}/>
+          <FiltrosProducto
+            decodedText={decodedText}
+            Buscar={Buscar}
+            listaModelosPorMarca={listaModelosPorMarca}
+          />
         </div>
         <div className="w-full">
           <TablaProducto columns={columns} data={listaProducto} />

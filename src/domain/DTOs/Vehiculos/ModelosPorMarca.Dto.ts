@@ -1,4 +1,4 @@
 export type ModelosPorMarca = {
-    Brand: string;
-    Models: string[];
+    Marca: string;
+    Modelos: string[];
 }

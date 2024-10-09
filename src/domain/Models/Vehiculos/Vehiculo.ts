@@ -1,6 +1,6 @@
 export type Vehiculo = {
-    Brand: string;
-    Model: string;
-    YearStart?: number;
-    YearTo?: number;
+    Marca: string;
+    Modelo: string;
+    Desde?: number;
+    Hasta?: number;
 }

@@ -24,10 +24,14 @@ import React, { useEffect, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Trash2Icon } from "lucide-react";
+import { Trash2Icon, SaveAll, DoorOpen } from "lucide-react";
 import { z } from "zod";
 import { Producto } from "@/domain/Models/Productos/Producto";
-import { GuardaProducto } from "@/domain/Services/ProductoService";
+import {
+  GetProductoById,
+  ActualizaProducto,
+  InsertaProducto,
+} from "@/domain/Services/ProductoService";
 
 import { ModelosPorMarca } from "@/domain/DTOs/Vehiculos/ModelosPorMarca.Dto";
 import { Label } from "@/components/ui/label";
@@ -40,9 +44,15 @@ import {
   MantenedorProductoDefault,
 } from "./Schemas/MantenedorProducto.schema";
 import { EscanerProducto } from "@/app/global/Components/Camara";
-import { GetModelosPorMarca } from "@/domain/Services/VehiculoService";
+import {
+  GetModelosPorMarca,
+  GetVehiculosPorProducto,
+} from "@/domain/Services/VehiculoService";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useRouter } from "next/navigation";
+import { useAdministraProductoStore } from "../Store/AdmistraProducto.store";
 
-export default function MantenedorProducto() {
+export default function MantenedorProductoPage() {
   const form = useForm<z.infer<typeof MantenedorProductoSchema>>({
     resolver: zodResolver(MantenedorProductoSchema),
     defaultValues: MantenedorProductoDefault,
@@ -54,30 +64,42 @@ export default function MantenedorProducto() {
   const [modeloSeleccionado, setModeloSeleccionado] = useState<string>("");
   const [anioDesde, setAnioDesde] = useState<number>();
   const [anioHasta, setAnioHasta] = useState<number>();
+  const [producto, setProducto] = useState<Producto | undefined>();
   const [vehiculos, setVehiculos] = useState<Vehiculo[]>([]);
 
   const [camaraActiva, setCamaraActiva] = useState<boolean>(false);
   const [decodedText, setDecodedText] = useState<string>();
+  const router = useRouter();
+
+  const { Codigo } = useAdministraProductoStore();
 
   useEffect(() => {
     Listas();
+    isEdit();
   }, []);
 
   if (decodedText) {
     form.setValue("Codigo", decodedText);
   }
 
+  const isEdit = async () => {
+    if (Codigo) {
+      const Item = await GetProductoById(Codigo);
+      if (Item) {
+        form.setValue("Codigo", Item.Codigo);
+        form.setValue("Descripcion", Item.Descripcion);
+        form.setValue("Existencia", Item.Existencia);
+        form.setValue("Costo", Item.Costo);
+        form.setValue("Precio", Item.Precio);
+      }
+      setProducto(Item);
+      setVehiculos(await GetVehiculosPorProducto(Codigo));
+    }
+  };
+
   const Listas = async () => {
     setListaModelosPorMarca(await GetModelosPorMarca());
   };
-
-  /*if (props.producto) {
-    form.setValue("Codigo", props.producto.Item!.Codigo);
-    form.setValue("Descripcion", props.producto.Item!.Descripcion);
-    form.setValue("Existencia", props.producto.Item!.Existencia);
-    form.setValue("Costo", props.producto.Item!.Costo);
-    form.setValue("Precio", props.producto.Item!.Precio);
-  }*/
 
   function FiltraModelos() {
     if (marcaSeleccionada == "") {
@@ -85,10 +107,10 @@ export default function MantenedorProducto() {
     } else {
       const modelos: ModelosPorMarca[] | undefined =
         listaModelosPorMarca?.filter((item) => {
-          return item.Brand == marcaSeleccionada;
+          return item.Marca == marcaSeleccionada;
         });
 
-      return modelos![0].Models.map((item) => {
+      return modelos![0].Modelos.map((item) => {
         return (
           <SelectItem key={item} value={item}>
             {item}
@@ -101,41 +123,54 @@ export default function MantenedorProducto() {
   function MuestraVehiculos() {
     return vehiculos.map((item) => (
       <div
-        key={item.Brand + " - " + item.Model}
+        key={item.Marca + " - " + item.Modelo}
         className="flex gap-4 content-center my-1"
       >
         <Trash2Icon
           className="text-teal-600"
           onClick={() => {
-            eliminaVehiculo(item.Brand, item.Model);
+            eliminaVehiculo(item.Marca, item.Modelo);
           }}
         />
-        <Label className="mt-1">{`${item.Brand} - ${item.Model} (${
-          item.YearStart ?? ""
-        } - ${item.YearTo ?? ""})`}</Label>
+        <Label className="mt-1">{`${item.Marca} - ${item.Modelo} (${
+          item.Desde ?? ""
+        } - ${item.Hasta ?? ""})`}</Label>
       </div>
     ));
   }
 
   function handleClose() {
-    form.reset();
+    router.push("/Mantenedores/Productos/Lista");
   }
 
-  function handleSubmit() {
-    form.trigger();
-    if (form.formState.isValid) {
-      const NewItem: Producto = {
-        //Id: props.producto ? props.producto.Item!.Id : undefined,
-        Codigo: form.getValues("Codigo"),
-        Descripcion: form.getValues("Descripcion"),
-        Existencia: form.getValues("Existencia"),
-        Costo: form.getValues("Costo"),
-        Precio: form.getValues("Precio"),
-      };
-      GuardaProducto(NewItem);
-      handleClose();
-    }
-  }
+  const handleSubmit = async () => {
+    form.trigger().then(() => {
+      if (form.formState.isValid) {
+        const NewItem: Producto = {
+          //Id: props.producto ? props.producto.Item!.Id : undefined,
+          Codigo: form.getValues("Codigo"),
+          Descripcion: form.getValues("Descripcion"),
+          Vigente: form.getValues("Vigente"),
+          Existencia: form.getValues("Existencia"),
+          Costo: form.getValues("Costo"),
+          Precio: form.getValues("Precio"),
+        };
+        if (Codigo) {
+          ActualizaProducto({
+            Item: NewItem,
+            Vehiculos: vehiculos,
+          });
+        } else {
+          InsertaProducto({
+            Item: NewItem,
+            Vehiculos: vehiculos,
+          });
+        }
+
+        handleClose();
+      }
+    });
+  };
 
   function agregaVehiculo() {
     if (!marcaSeleccionada) {
@@ -145,27 +180,27 @@ export default function MantenedorProducto() {
       return;
     }
 
-    const lista = vehiculos.filter((item) => item.Brand != "");
+    const lista = vehiculos.filter((item) => item.Marca != "");
 
     if (
       !lista.find(
-        (x) => x.Brand === marcaSeleccionada && x.Model === modeloSeleccionado
+        (x) => x.Marca === marcaSeleccionada && x.Modelo === modeloSeleccionado
       )
     ) {
       lista.push({
-        Brand: marcaSeleccionada,
-        Model: modeloSeleccionado,
-        YearStart: anioDesde,
-        YearTo: anioHasta ?? anioDesde,
+        Marca: marcaSeleccionada,
+        Modelo: modeloSeleccionado,
+        Desde: anioDesde,
+        Hasta: anioHasta ?? anioDesde,
       });
 
       setVehiculos(lista);
     }
   }
 
-  function eliminaVehiculo(Brand: string, Model: string) {
+  function eliminaVehiculo(Marca: string, Modelo: string) {
     const lista = vehiculos.filter(
-      (item) => item.Brand + item.Model != Brand + Model
+      (item) => item.Marca + item.Modelo != Marca + Modelo
     );
 
     setVehiculos(lista);
@@ -191,12 +226,7 @@ export default function MantenedorProducto() {
   return (
     <main className="grid grid-cols-1 gap-3 p-4">
       <Form {...form}>
-        <form
-          action={async () => {
-            handleSubmit();
-          }}
-          className="grid grid-cols-4 gap-4"
-        >
+        <form className="grid grid-cols-4 gap-4">
           <FormField
             control={form.control}
             name="Codigo"
@@ -204,16 +234,21 @@ export default function MantenedorProducto() {
               <FormItem className="col-span-3 ">
                 <FormLabel>Codigo</FormLabel>
                 <FormControl>
-                  <Input placeholder="Codigo" {...field} />
+                  <Input
+                    disabled={producto ? true : false}
+                    placeholder="Codigo"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <div className="col-span-1 content-end">
+          <div className="col-span-1 content-end ">
             <Button
               type="button"
-              className="self-end"
+              className={producto ? "self-end hidden" : "self-end"}
+              hidden={producto ? true : false}
               onClick={() => {
                 setCamaraActiva(true);
                 setDecodedText("");
@@ -232,6 +267,23 @@ export default function MantenedorProducto() {
                   <Textarea placeholder="Descripcion" {...field} />
                 </FormControl>
                 <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="Vigente"
+            render={({ field }) => (
+              <FormItem className="col-span-4 flex flex-row">
+                <div className="">
+                  <FormLabel className="mr-4">Vigente</FormLabel>
+                </div>
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
               </FormItem>
             )}
           />
@@ -295,8 +347,8 @@ export default function MantenedorProducto() {
                     <SelectLabel>Marcas</SelectLabel>
                     {listaModelosPorMarca?.map((item) => {
                       return (
-                        <SelectItem key={item.Brand} value={item.Brand}>
-                          {item.Brand}
+                        <SelectItem key={item.Marca} value={item.Marca}>
+                          {item.Marca}
                         </SelectItem>
                       );
                     })}
@@ -395,6 +447,28 @@ export default function MantenedorProducto() {
           setDecodedText={setDecodedText}
         />
       </Form>
+
+      <Separator className="my-4" />
+      <div className="flex justify-end">
+        <Button
+          className="bg-teal-600 ml-2"
+          onClick={async () => {
+            handleSubmit();
+          }}
+        >
+          <SaveAll className="mr-2" />
+          Guardar
+        </Button>
+        <Button
+          className="bg-teal-600 ml-2"
+          onClick={async () => {
+            handleClose();
+          }}
+        >
+          <DoorOpen className="mr-2" />
+          Salir
+        </Button>
+      </div>
     </main>
   );
 }
