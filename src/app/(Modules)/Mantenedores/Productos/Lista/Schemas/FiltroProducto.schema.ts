@@ -1,10 +1,9 @@
-
 import { FiltroProducto } from "@/domain/DTOs/Productos/FiltroProducto";
 import { z } from "zod";
 
 export const FiltroProductoSchema = z.object({
-  Codigo: z.string().max(10).optional(),
-  Descripcion: z.string().optional(),
+  Codigo: z.string().max(50, "Maximo 50 caracteres").optional(),
+  Descripcion: z.string().max(50, "Maximo 50 caracteres").optional(),
 });
 
 export const FiltroProductoDefault: FiltroProducto = {

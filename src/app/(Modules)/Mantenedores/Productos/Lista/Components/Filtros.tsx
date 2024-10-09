@@ -59,7 +59,6 @@ export default function FiltrosProducto(props: Readonly<FiltroProductoProps>) {
           Modelo: modeloSeleccionado,
           Marca: marcaSeleccionada,
         };
-        console.log("NewItem", NewItem);
         props.Buscar(NewItem);
       }
     });
@@ -127,7 +126,6 @@ export default function FiltrosProducto(props: Readonly<FiltroProductoProps>) {
                 <Select
                   value={marcaSeleccionada}
                   onValueChange={(e) => {
-                    console.log("e", e);
                     setMarcaSeleccionada(e);
                   }}
                 >
@@ -156,7 +154,6 @@ export default function FiltrosProducto(props: Readonly<FiltroProductoProps>) {
                 <Select
                   value={modeloSeleccionado}
                   onValueChange={(e) => {
-                    console.log("e", e);
                     setModeloSeleccionado(e);
                   }}
                 >

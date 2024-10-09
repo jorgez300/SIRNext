@@ -39,10 +39,7 @@ import { Separator } from "@/components/ui/separator";
 import { Vehiculo } from "@/domain/Models/Vehiculos/Vehiculo";
 import { Textarea } from "@/components/ui/textarea";
 
-import {
-  MantenedorProductoSchema,
-  MantenedorProductoDefault,
-} from "./Schemas/MantenedorProducto.schema";
+import { MantenedorProductoSchema } from "./Schemas/MantenedorProducto.schema";
 import { EscanerProducto } from "@/app/global/Components/Camara";
 import {
   GetModelosPorMarca,
@@ -51,11 +48,12 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { useRouter } from "next/navigation";
 import { useAdministraProductoStore } from "../Store/AdmistraProducto.store";
+import { AlertaAceptarCancelar } from "@/app/global/Components/Alertas.Confirmacion";
 
 export default function MantenedorProductoPage() {
   const form = useForm<z.infer<typeof MantenedorProductoSchema>>({
     resolver: zodResolver(MantenedorProductoSchema),
-    defaultValues: MantenedorProductoDefault,
+    //defaultValues: MantenedorProductoDefault,
   });
   const [listaModelosPorMarca, setListaModelosPorMarca] = useState<
     ModelosPorMarca[]
@@ -69,6 +67,9 @@ export default function MantenedorProductoPage() {
 
   const [camaraActiva, setCamaraActiva] = useState<boolean>(false);
   const [decodedText, setDecodedText] = useState<string>();
+
+  const [confirmacion, setConfirmacion] = useState(false);
+
   const router = useRouter();
 
   const { Codigo } = useAdministraProductoStore();
@@ -83,6 +84,7 @@ export default function MantenedorProductoPage() {
   }
 
   const isEdit = async () => {
+    form.setValue("Vigente", true);
     if (Codigo) {
       const Item = await GetProductoById(Codigo);
       if (Item) {
@@ -91,6 +93,7 @@ export default function MantenedorProductoPage() {
         form.setValue("Existencia", Item.Existencia);
         form.setValue("Costo", Item.Costo);
         form.setValue("Precio", Item.Precio);
+        form.setValue("Vigente", Item.Vigente!);
       }
       setProducto(Item);
       setVehiculos(await GetVehiculosPorProducto(Codigo));
@@ -127,6 +130,7 @@ export default function MantenedorProductoPage() {
         className="flex gap-4 content-center my-1"
       >
         <Trash2Icon
+          size={30}
           className="text-teal-600"
           onClick={() => {
             eliminaVehiculo(item.Marca, item.Modelo);
@@ -221,6 +225,19 @@ export default function MantenedorProductoPage() {
     }
 
     return listaAños;
+  };
+
+  const ConfirmacionVisible = (flag: boolean) => {
+    setConfirmacion(flag);
+  };
+
+  const ConfirmacionAceptar = () => {
+    handleSubmit();
+    setConfirmacion(false);
+  };
+
+  const ConfirmacionCancelar = () => {
+    setConfirmacion(false);
   };
 
   return (
@@ -334,9 +351,10 @@ export default function MantenedorProductoPage() {
             <div className="space-y-2">
               <Label htmlFor="Marca">Marca</Label>
               <Select
+                value={marcaSeleccionada}
                 onValueChange={(e) => {
-                  console.log("e", e);
                   setMarcaSeleccionada(e);
+                  setModeloSeleccionado("");
                 }}
               >
                 <SelectTrigger className="">
@@ -359,8 +377,8 @@ export default function MantenedorProductoPage() {
             <div className="space-y-2">
               <Label htmlFor="Modelo">Modelo</Label>
               <Select
+                value={modeloSeleccionado}
                 onValueChange={(e) => {
-                  console.log("e", e);
                   setModeloSeleccionado(e);
                 }}
               >
@@ -379,7 +397,6 @@ export default function MantenedorProductoPage() {
               <Label htmlFor="Desde">Desde</Label>
               <Select
                 onValueChange={(e) => {
-                  console.log("e", e);
                   setAnioDesde(Number.parseInt(e));
                 }}
               >
@@ -453,7 +470,7 @@ export default function MantenedorProductoPage() {
         <Button
           className="bg-teal-600 ml-2"
           onClick={async () => {
-            handleSubmit();
+            ConfirmacionVisible(true);
           }}
         >
           <SaveAll className="mr-2" />
@@ -469,6 +486,15 @@ export default function MantenedorProductoPage() {
           Salir
         </Button>
       </div>
+      <AlertaAceptarCancelar
+        Titulo="Confirmacion"
+        Mensaje="Desea guardar los cambios?"
+        Tipo="Confirmacion"
+        AccionAceptar={ConfirmacionAceptar}
+        AccionCancelar={ConfirmacionCancelar}
+        open={confirmacion}
+        setOpen={ConfirmacionVisible}
+      />
     </main>
   );
 }
