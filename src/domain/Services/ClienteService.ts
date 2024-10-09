@@ -1,6 +1,6 @@
 "use server";
 
-import { FiltroCliente } from "../DTOs/FiltroClientes";
+import { FiltroCliente } from "../DTOs/Clientes/FiltroClientes";
 import { Cliente } from "../Models/Clientes/Cliente";
 
 export const GetClientes = async (filtro?: FiltroCliente) => {

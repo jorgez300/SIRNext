@@ -1,6 +1,6 @@
 "use server";
 
-import { FiltroCosto } from "../DTOs/FiltroCosto";
+import { FiltroCosto } from "../DTOs/Costos/FiltroCosto";
 import { Costo } from "../Models/Costos/Costo";
 
 
