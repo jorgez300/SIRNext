@@ -4,9 +4,12 @@ import { ExecQuery, GetCursor } from "../Clients/DatabaseClient";
 import { FiltroProducto } from "../DTOs/Productos/FiltroProducto";
 import { ProductoCompleto } from "../DTOs/Productos/ProductoCompleto";
 import { Producto } from "../Models/Productos/Producto";
-import { EliminaVehiculosPorProducto, InsertaVehiculosPorProducto } from "./VehiculoService";
+import {
+  EliminaVehiculosPorProducto,
+  InsertaVehiculosPorProducto,
+} from "./VehiculoService";
 
-export const GetProductos = async (filtro?: FiltroProducto) => {
+export const GetProductos = async (filtro?: FiltroProducto)  : Promise<Producto[]>=> {
   let query = ``;
 
   if (filtro) {
@@ -26,15 +29,14 @@ export const GetProductos = async (filtro?: FiltroProducto) => {
       filtro.Modelo ?? ""
     }')
               ORDER BY p.descripcion ASC
-              LIMIT 10`;
+              LIMIT 100`;
   } else {
     query = `SELECT Codigo, Descripcion, Vigente, existencia, costo, precio, minimo, maximo 
             FROM public.productos P 
             ORDER BY P.descripcion ASC
-            LIMIT 10`;
+            LIMIT 100`;
   }
 
-  console.log("GetProductos", filtro);
   const lista: Producto[] = [];
   const data = await GetCursor(query);
   data.forEach((item) => {
@@ -42,6 +44,7 @@ export const GetProductos = async (filtro?: FiltroProducto) => {
       Codigo: item.codigo,
       Descripcion: item.descripcion,
       Existencia: item.existencia,
+      Vigente: item.vigente,
       Costo: item.costo,
       Precio: item.precio,
     });
@@ -49,7 +52,7 @@ export const GetProductos = async (filtro?: FiltroProducto) => {
   return lista;
 };
 
-export const GetProductoById = async (id: string) => {
+export const GetProductoById = async (id: string) : Promise<Producto> => {
   const query = `SELECT Codigo, Descripcion, Vigente, existencia, costo, precio, minimo, maximo 
                 FROM public.productos 
                 WHERE Codigo = '${id}'`;
@@ -60,13 +63,13 @@ export const GetProductoById = async (id: string) => {
     Codigo: data[0].codigo,
     Descripcion: data[0].descripcion,
     Existencia: data[0].existencia,
+    Vigente: data[0].vigente,
     Costo: data[0].costo,
     Precio: data[0].precio,
   };
 };
 
 export const ActualizaProducto = async (Producto: ProductoCompleto) => {
-
   await EliminaVehiculosPorProducto(Producto.Item!.Codigo);
 
   const query = `UPDATE public.productos
@@ -80,15 +83,12 @@ export const ActualizaProducto = async (Producto: ProductoCompleto) => {
               maximo=${Producto.Item!.Maximo ?? "NULL"}
             WHERE codigo = '${Producto.Item!.Codigo ?? ""}'`;
 
-  console.log("ActualizaProducto", query);
-
   await ExecQuery(query);
 
-  await InsertaVehiculosPorProducto(Producto.Item!.Codigo, Producto.Vehiculos!)
+  await InsertaVehiculosPorProducto(Producto.Item!.Codigo, Producto.Vehiculos!);
 };
 
 export const InsertaProducto = async (Producto: ProductoCompleto) => {
-
   await EliminaVehiculosPorProducto(Producto.Item!.Codigo);
 
   const query = `INSERT INTO Productos (Codigo, Descripcion, Vigente, Existencia, Costo, Precio, Minimo, Maximo) VALUES
@@ -103,9 +103,7 @@ export const InsertaProducto = async (Producto: ProductoCompleto) => {
                     ${Producto.Item!.Maximo ?? "NULL"}
                   )`;
 
-  console.log("InsertaProducto", query);
-
   await ExecQuery(query);
 
-  await InsertaVehiculosPorProducto(Producto.Item!.Codigo, Producto.Vehiculos!)
+  await InsertaVehiculosPorProducto(Producto.Item!.Codigo, Producto.Vehiculos!);
 };

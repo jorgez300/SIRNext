@@ -1,14 +1,19 @@
-import pg, { PoolConfig } from "pg";
+import pg from "pg";
+//import { ObtieneVariable } from "../Helpers/VariablesEntornoHelper";
 
-const poolConfig: PoolConfig = {
+/*const poolConfig: PoolConfig = {
   user: "su",
   host: "localhost",
   password: "password",
   database: "sirnext",
   port: 39001,
-};
+};*/
 
-const pool = new pg.Pool(poolConfig);
+//const pool = new pg.Pool(poolConfig);
+
+const pool = new pg.Pool({
+  connectionString: process.env["POSTGRES_URL"],
+});
 
 export const GetCursor = async (query: string) => {
   const data = await pool.query(query);
@@ -16,7 +21,5 @@ export const GetCursor = async (query: string) => {
 };
 
 export const ExecQuery = async (query: string) => {
-    const data = await pool.query(query);
-  
-    console.log(data);
-  };
+  await pool.query(query);
+};
