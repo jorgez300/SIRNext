@@ -17,7 +17,7 @@ import { useForm } from "react-hook-form";
 
 import { z } from "zod";
 
-import { SearchCheckIcon } from "lucide-react";
+import { Brush, SearchCheckIcon } from "lucide-react";
 import {
   FiltroClienteSchema,
   FiltroClienteDefault,
@@ -35,20 +35,30 @@ export default function FiltrosCliente(props: Readonly<FiltroClienteProps>) {
   });
 
   function handleSubmit() {
-    form.trigger();
-    if (form.formState.isValid) {
-      const NewItem: FiltroCliente = {
-        Nombre: form.getValues("Nombre"),
-      };
-      props.Buscar(NewItem);
-    }
+    form.trigger().then(() => {
+      if (form.formState.isValid) {
+        const NewItem: FiltroCliente = {
+          Nombre: form.getValues("Nombre"),
+        };
+        props.Buscar(NewItem);
+      }
+    });
   }
+
+  const handleLimpiar = async () => {
+    form.reset();
+  };
 
   return (
     <div className="grid grid-cols-1 gap-4">
       <div>
         <Form {...form}>
-          <form className="grid grid-cols-4 gap-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+            }}
+            className="grid grid-cols-4 gap-4"
+          >
             <FormField
               control={form.control}
               name="Nombre"
@@ -66,10 +76,18 @@ export default function FiltrosCliente(props: Readonly<FiltroClienteProps>) {
         </Form>
       </div>
       <div>
-        <div className="flex justify-start">
+        <div className="flex justify-start gap-2">
           <Button onClick={handleSubmit}>
             <SearchCheckIcon className="mr-2" />
             Consultar
+          </Button>
+          <Button
+            variant="destructive"
+            className="mr-2"
+            onClick={handleLimpiar}
+          >
+            <Brush className="mr-2" />
+            Limpiar
           </Button>
         </div>
       </div>

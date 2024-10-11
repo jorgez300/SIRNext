@@ -82,6 +82,10 @@ export default function ProductoPage() {
       header: "Existencia",
     },
     {
+      accessorKey: "MarcaProd",
+      header: "Marca producto",
+    },
+    {
       accessorKey: "Costo",
       header: "Costo",
     },

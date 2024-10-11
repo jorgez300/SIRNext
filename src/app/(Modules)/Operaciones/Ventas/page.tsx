@@ -1,120 +1,27 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { ItemVenta } from "@/domain/Models/Ventas/ItemVenta";
 import {
-  ColumnDef,
-  getCoreRowModel,
-  useReactTable,
-  RowData,
-} from "@tanstack/react-table";
+  Table,
+  TableBody,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { PlusIcon, Trash2Icon } from "lucide-react";
-import React from "react";
-import { TablaItemsVenta } from "./Components/Tabla";
-import {CeldaNumerica, CeldaDecimal} from "@/app/global/Components/Tabla.CeldaEditable";
 
-declare module "@tanstack/react-table" {
-  interface TableMeta<TData extends RowData> {
-    updateData?: (
-      rowIndex: number,
-      columnId: string,
-      value: string,
-      x?: TData
-    ) => void;
-  }
-}
+import React from "react";
+import { RegistroVenta } from "@/domain/DTOs/Ventas/RegistroVenta";
+import { Input } from "@/components/ui/input";
 
 export default function OperacionVentaPage() {
-  const [data, setData] = React.useState<ItemVenta[]>([]);
+  const [data, setData] = React.useState<RegistroVenta[]>([]);
 
-  const columns: ColumnDef<ItemVenta>[] = [
-    {
-      accessorKey: "Posicion",
-      header: "Posicion",
-    },
-    {
-      accessorKey: "InventarioId",
-      header: "InventarioId",
-    },
-    {
-      accessorKey: "Cantidad",
-      cell: ({ row, column, getValue, table }) => {
-        return (
-          <CeldaNumerica
-            row={row}
-            columnId={column.id}
-            value={getValue<string>()}
-            updateData={table.options.meta!.updateData}
-          />
-        );
-      },
-    },
-    {
-      accessorKey: "Precio",
-      cell: ({ row, column, getValue, table }) => {
-        return (
-          <CeldaDecimal
-            row={row}
-            columnId={column.id}
-            value={getValue<string>()}
-            updateData={table.options.meta!.updateData}
-          />
-        );
-      },
-    },
-    {
-      accessorKey: "Total",
-      cell: ({ row, column, getValue, table }) => {
-        return (
-          <CeldaDecimal
-            row={row}
-            columnId={column.id}
-            value={getValue<string>()}
-            updateData={table.options.meta!.updateData}
-          />
-        );
-      },
-    },
-    {
-      header: "Acciones",
-      cell: ({ row }) => {
-        const itemVenta = row.original;
-        return (
-          <div className="grid grid-cols-2 gap-3 w-52">
-            <Trash2Icon
-              className="text-teal-600"
-              onClick={() => {
-                EliminarItemVenta(itemVenta.Posicion);
-              }}
-            />
-          </div>
-        );
-      },
-    },
-  ];
-
-  const table = useReactTable({
-    columns,
-    data,
-    getCoreRowModel: getCoreRowModel(),
-    meta: {
-      updateData: (rowIndex: number, columnId: string, value: string) =>
-        setData((prev) =>
-          prev.map((row, index) =>
-            index === rowIndex
-              ? {
-                  ...prev[rowIndex],
-                  [columnId]: value,
-                }
-              : row
-          )
-        ),
-    },
-  });
-
-  const OrdenaPosicion = (lista: ItemVenta[]) => {
+  const OrdenaPosicion = (lista: RegistroVenta[]) => {
     const nuevaLista = lista.map((item, i) => ({
-      ...item, // Copiar las propiedades existentes
-      Posicion: i, // Actualizar la propiedad 'nombre'
+      ...item,
+      Posicion: i,
     }));
     setData(nuevaLista);
     console.log(data);
@@ -124,11 +31,13 @@ export default function OperacionVentaPage() {
     const lista = data;
 
     lista.push({
-      VentaId: "1",
-      InventarioId: "Producto_1",
-      Cantidad: 1,
-      Precio: 10.5,
       Posicion: 0,
+      ProductoId: "Producto_1",
+      ProductoDsc: "Producto_1",
+      Cantidad: 1,
+      Costo: 10.5,
+      Precio: 12,
+      Total: 12,
     });
 
     OrdenaPosicion(lista);
@@ -136,9 +45,20 @@ export default function OperacionVentaPage() {
 
   const EliminarItemVenta = (posicion: number) => {
     const lista = data;
-    const nlista: ItemVenta[] = lista.filter(
+    const nlista: RegistroVenta[] = lista.filter(
       (item) => item.Posicion !== posicion
     );
+
+    OrdenaPosicion(nlista);
+  };
+
+  const ActualizaItemVenta = (posicion: number, cantidad: number) => {
+    const lista = data;
+    const nlista: RegistroVenta[] = lista.filter((item) => item.Posicion >= 0);
+    console.log(nlista);
+    nlista[posicion].Cantidad = cantidad;
+    nlista[posicion].Total =
+      nlista[posicion].Precio * nlista[posicion].Cantidad;
 
     OrdenaPosicion(nlista);
   };
@@ -166,7 +86,68 @@ export default function OperacionVentaPage() {
         </Button>
       </div>
       <div className="w-full">
-        <TablaItemsVenta columns={columns} table={table} />
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">Acciones</TableHead>
+              <TableHead className="w-[300px]">ProductoId</TableHead>
+              <TableHead>ProductoDsc</TableHead>
+              <TableHead className="w-[100px] text-center">Cantidad</TableHead>
+              <TableHead className="w-[100px] text-center">Precio</TableHead>
+              <TableHead className="w-[100px] text-center">Total</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.map((itemVenta) => (
+              <TableRow key={itemVenta.Posicion}>
+                <TableCell>
+                  <Trash2Icon
+                    className="text-teal-600"
+                    onClick={() => {
+                      EliminarItemVenta(itemVenta.Posicion);
+                    }}
+                  />
+                </TableCell>
+                <TableCell>{itemVenta.ProductoId}</TableCell>
+                <TableCell>{itemVenta.ProductoDsc}</TableCell>
+                <TableCell>
+                  <Input
+                    maxLength={3}
+                    type="number"
+                    className="w-full"
+                    value={itemVenta.Cantidad}
+                    onChange={(e) => {
+                      ActualizaItemVenta(
+                        itemVenta.Posicion,
+                        Number(e.target.value)
+                      );
+                    }}
+                    onBlur={(e) => {
+                      ActualizaItemVenta(
+                        itemVenta.Posicion,
+                        Number(e.target.value)
+                      );
+                    }}
+                  ></Input>
+                </TableCell>
+                <TableCell className="text-center">
+                  {itemVenta.Precio}
+                </TableCell>
+                <TableCell className="text-center">{itemVenta.Total}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TableCell colSpan={5}>Total</TableCell>
+              <TableCell className="text-center">
+                {data.reduce((acumulador, producto) => {
+                  return acumulador + producto.Total;
+                }, 0)}
+              </TableCell>
+            </TableRow>
+          </TableFooter>
+        </Table>
       </div>
     </main>
   );

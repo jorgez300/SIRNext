@@ -60,7 +60,7 @@ export function AlertaAceptarCancelar(props: AlertaAceptarCancelar) {
             {props.TextoAceptar ?? "Aceptar"}
           </Button>
           <Button
-           variant="destructive"
+            variant="destructive"
             onClick={async () => {
               props.AccionCancelar();
             }}

@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/select";
 
 type FiltroProductoProps = {
-  Buscar: (filtros: FiltroProducto) => void;
+  Buscar: (filtros: FiltroProducto) => Promise<void>;
   decodedText?: string;
   listaModelosPorMarca: ModelosPorMarca[];
 };
@@ -51,15 +51,18 @@ export default function FiltrosProducto(props: Readonly<FiltroProductoProps>) {
   }
 
   const handleSubmit = async () => {
-    form.trigger().then(() => {
+    form.trigger().then(async () => {
       if (form.formState.isValid) {
         const NewItem: FiltroProducto = {
           Codigo: form.getValues("Codigo"),
           Descripcion: form.getValues("Descripcion"),
-          Modelo: modeloSeleccionado,
-          Marca: marcaSeleccionada,
+          MarcaProd: form.getValues("MarcaProd"),
+          Vehiculo: {
+            Modelo: modeloSeleccionado,
+            Marca: marcaSeleccionada,
+          },
         };
-        props.Buscar(NewItem);
+        await props.Buscar(NewItem);
       }
     });
   };
@@ -101,7 +104,10 @@ export default function FiltrosProducto(props: Readonly<FiltroProductoProps>) {
                 <FormItem className="col-span-2 ">
                   <FormLabel>Codigo</FormLabel>
                   <FormControl>
-                    <Input placeholder="Codigo" {...field} />
+                    <Input
+                      placeholder="Codigo"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -120,9 +126,22 @@ export default function FiltrosProducto(props: Readonly<FiltroProductoProps>) {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="MarcaProd"
+              render={({ field }) => (
+                <FormItem className="col-span-2 ">
+                  <FormLabel>Marca Producto</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Marca Producto" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="Marca">Marca</Label>
+                <Label htmlFor="Marca">Marca Vehiculo</Label>
                 <Select
                   value={marcaSeleccionada}
                   onValueChange={(e) => {
@@ -150,7 +169,7 @@ export default function FiltrosProducto(props: Readonly<FiltroProductoProps>) {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="Modelo">Modelo</Label>
+                <Label htmlFor="Modelo">Modelo Vehiculo</Label>
                 <Select
                   value={modeloSeleccionado}
                   onValueChange={(e) => {
@@ -181,7 +200,7 @@ export default function FiltrosProducto(props: Readonly<FiltroProductoProps>) {
             <SearchCheckIcon className="mr-2" />
             Consultar
           </Button>
-          <Button className="mr-2" onClick={handleLimpiar}>
+          <Button  variant="destructive" className="mr-2" onClick={handleLimpiar}>
             <Brush className="mr-2" />
             Limpiar
           </Button>
