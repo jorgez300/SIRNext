@@ -10,6 +10,7 @@ import { Costo } from "@/domain/Models/Costos/Costo";
 import FiltrosCosto from "./Components/Filtros";
 import MantenedorCosto from "./Components/Mantenedor";
 import { TablaCosto } from "./Components/Tabla";
+import { useCodPantallaStore } from "@/app/global/Store/CodPantalla.store";
 
 
 export default function CostoPage() {
@@ -17,8 +18,14 @@ export default function CostoPage() {
   const [open, setOpen] = useState(false);
   const [listaCosto, setListaCosto] = useState<Costo[]>([]);
   const [costo, setCosto] = useState<Costo | undefined>();
+  const { RegistraCodPantalla } = useCodPantallaStore();
 
   useEffect(() => {
+    RegistraCodPantalla({
+      Codigo: "",
+      Version: "V 0.1",
+      Titulo: "Administrar Costos",
+    });
     Buscar();
   }, []);
 

@@ -33,6 +33,7 @@ export const GetProductos = async (
 	              and (pv.modelo = '${filtro.Vehiculo!.Modelo ?? ""}' or '' = '${
       filtro.Vehiculo!.Modelo ?? ""
     }')
+              ${filtro.ConExistencia ? "and p.existencia > 0" : ""}
               ORDER BY p.descripcion ASC
               LIMIT 100`;
   } else {
@@ -41,6 +42,42 @@ export const GetProductos = async (
             ORDER BY P.descripcion ASC
             LIMIT 100`;
   }
+  const lista: Producto[] = [];
+  const data = await GetCursor(query);
+  data.forEach((item) => {
+    lista.push({
+      Codigo: item.codigo,
+      Descripcion: item.descripcion,
+      MarcaProd: item.marcaprod,
+      Existencia: item.existencia,
+      Vigente: item.vigente,
+      Costo: item.costo,
+      Precio: item.precio,
+    });
+  });
+  return lista;
+};
+
+export const GetProductosOperacion = async (
+  filtro: FiltroProducto
+): Promise<Producto[]> => {
+  let query = ``;
+
+  query = `SELECT distinct p.codigo, p.descripcion, marcaprod, p.vigente, p.existencia, p.costo, p.precio, p.minimo, p.maximo
+              FROM public.productos p left join public.productosvehiculos pv on p.codigo = pv.codigo
+              WHERE 
+                ( UPPER(p.codigo) like '%${
+                  filtro.Codigo ? filtro.Codigo.toUpperCase() : ""
+                }%' or '' = '${filtro.Codigo ?? ""}')
+                or (UPPER(p.marcaprod) like '%${
+                  filtro.MarcaProd ? filtro.MarcaProd.toUpperCase() : ""
+                }%' or '' = '${filtro.MarcaProd ?? ""}')
+                or (UPPER(p.descripcion) like '%${
+                  filtro.Descripcion ? filtro.Descripcion.toUpperCase() : ""
+                }%' or '' = '${filtro.Descripcion ?? ""}')
+              and p.existencia > 0
+              ORDER BY p.descripcion ASC
+              LIMIT 20`;
 
   const lista: Producto[] = [];
   const data = await GetCursor(query);
@@ -61,14 +98,11 @@ export const GetProductos = async (
 export const GetProductoById = async (
   id: string
 ): Promise<Producto | undefined> => {
-
   const query = `SELECT Codigo, Descripcion, marcaprod, Vigente, existencia, costo, precio, minimo, maximo 
                 FROM public.productos 
                 WHERE Codigo = '${id}'`;
 
   const data = await GetCursor(query);
-
-  
 
   if (data.length == 0) {
     return undefined;
@@ -124,4 +158,18 @@ export const InsertaProducto = async (Producto: ProductoCompleto) => {
   await ExecQuery(query);
 
   await InsertaVehiculosPorProducto(Producto.Item!.Codigo, Producto.Vehiculos!);
+};
+
+export const ActualizaExistenciaProducto = async (
+  ProductoId: string,
+  Cantidad: number,
+  Operacion: '-' | '+'
+) => {
+  if (Cantidad == 0) return;
+  const query = `UPDATE public.productos
+            SET 
+              existencia= existencia ${Operacion} ${Cantidad}
+            WHERE codigo = '${ProductoId}'`;
+
+  await ExecQuery(query);
 };

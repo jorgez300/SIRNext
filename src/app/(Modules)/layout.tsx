@@ -13,7 +13,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
+
 import InfoUsuario from "./Layout/Components/InfoUsuario";
+import CodPantallaHeader from "./Layout/Components/CodPantallaHeader";
 
 //import { redirect } from "next/navigation";
 
@@ -82,10 +84,24 @@ export default function RootLayout({
                     <Handshake className="h-5 w-5" />
                     Costos
                   </Link>
+                  <Link
+                    href="/Mantenedores/Proveedores"
+                    className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                  >
+                    <Handshake className="h-5 w-5" />
+                    Proveedores
+                  </Link>
                 </nav>
               </SheetContent>
             </Sheet>
-            <InfoUsuario />
+            <div className="grid grid-cols-12 gap-2 xxx w-full">
+              <div className="col-span-11">
+                <CodPantallaHeader />
+              </div>
+              <div className="col-span-1 flex justify-end">
+                <InfoUsuario />
+              </div>
+            </div>
           </header>
           <Separator className="my-2" />
           {children}

@@ -49,6 +49,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useRouter } from "next/navigation";
 import { useAdministraProductoStore } from "../Store/AdmistraProducto.store";
 import { AlertaAceptarCancelar } from "@/app/global/Components/Alertas.Confirmacion";
+import { useCodPantallaStore } from "@/app/global/Store/CodPantalla.store";
 
 export default function MantenedorProductoPage() {
   const form = useForm<z.infer<typeof MantenedorProductoSchema>>({
@@ -73,8 +74,14 @@ export default function MantenedorProductoPage() {
   const router = useRouter();
 
   const { Codigo, RegistraCodigo } = useAdministraProductoStore();
+  const { RegistraCodPantalla } = useCodPantallaStore();
 
   useEffect(() => {
+    RegistraCodPantalla({
+      Codigo: "",
+      Version: "V 0.1",
+      Titulo: "Administrar productos",
+    });
     Listas();
     isEdit();
   }, []);

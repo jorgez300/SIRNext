@@ -1,17 +1,17 @@
 "use server";
 
 import { ExecQuery, GetCursor } from "../Clients/DatabaseClient";
-import { FiltroCliente } from "../DTOs/Clientes/FiltroClientes";
-import { Cliente } from "../Models/Clientes/Cliente";
+import { FiltroProveedor } from "../DTOs/Proveedores/FiltroProveedores";
+import { Proveedor } from "../Models/Proveedores/Proveedor";
 
-export const GetClientes = async (
-  filtro?: FiltroCliente
-): Promise<Cliente[]> => {
+export const GetProveedores = async (
+  filtro?: FiltroProveedor
+): Promise<Proveedor[]> => {
   let query = ``;
 
   if (filtro) {
     query = `SELECT id, identificacion, nombre
-              FROM public.clientes
+              FROM public.proveedores
               WHERE 
               (UPPER(identificacion) LIKE '%${
                 filtro.Identificacion ? filtro.Identificacion.toUpperCase() : ""
@@ -22,11 +22,11 @@ export const GetClientes = async (
               LIMIT 100`;
   } else {
     query = `SELECT id, identificacion, nombre
-              FROM public.clientes
+              FROM public.proveedores
               LIMIT 100`;
   }
 
-  const lista: Cliente[] = [];
+  const lista: Proveedor[] = [];
   const data = await GetCursor(query);
   data.forEach((item) => {
     lista.push({
@@ -39,13 +39,13 @@ export const GetClientes = async (
   return lista;
 };
 
-export const GetClientesOperacion = async (
-  filtro: FiltroCliente
-): Promise<Cliente[]> => {
+export const GetProveedoresOperacion = async (
+  filtro: FiltroProveedor
+): Promise<Proveedor[]> => {
   let query = ``;
 
   query = `SELECT id, identificacion, nombre
-              FROM public.clientes
+              FROM public.proveedores
               WHERE 
               (UPPER(identificacion) LIKE '%${
                 filtro.Identificacion ? filtro.Identificacion.toUpperCase() : ""
@@ -55,7 +55,7 @@ export const GetClientesOperacion = async (
               }%' OR '' = '${filtro.Nombre ?? ""}')
               LIMIT 20`;
 
-  const lista: Cliente[] = [];
+  const lista: Proveedor[] = [];
   const data = await GetCursor(query);
   data.forEach((item) => {
     lista.push({
@@ -68,11 +68,11 @@ export const GetClientesOperacion = async (
   return lista;
 };
 
-export const GetClienteById = async (
+export const GetProveedorById = async (
   id: string
-): Promise<Cliente | undefined> => {
+): Promise<Proveedor | undefined> => {
   const query = `SELECT id, identificacion, nombre
-                  FROM public.clientes
+                  FROM public.proveedores
                   WHERE 
                   id = ${id}
                   LIMIT 1`;
@@ -90,18 +90,18 @@ export const GetClienteById = async (
   };
 };
 
-export const ActualizaCliente = async (Cliente: Cliente) => {
-  const query = `UPDATE public.clientes SET 
-                  identificacion='${Cliente.Identificacion}', 
-                  nombre='${Cliente.Nombre}'
-                WHERE id=${Cliente.Id}`;
+export const ActualizaProveedor = async (item: Proveedor) => {
+  const query = `UPDATE public.proveedores SET 
+                  identificacion='${item.Identificacion}', 
+                  nombre='${item.Nombre}'
+                WHERE id=${item.Id}`;
 
   await ExecQuery(query);
 };
 
-export const InsertaCliente = async (Cliente: Cliente) => {
-  const query = `INSERT INTO public.clientes(identificacion, nombre) VALUES 
-                ('${Cliente.Identificacion}', '${Cliente.Nombre}')`;
+export const InsertaProveedor = async (item: Proveedor) => {
+  const query = `INSERT INTO public.proveedores(identificacion, nombre) VALUES 
+                ('${item.Identificacion}', '${item.Nombre}')`;
 
   await ExecQuery(query);
 };

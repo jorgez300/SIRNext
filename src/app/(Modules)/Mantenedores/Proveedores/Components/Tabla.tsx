@@ -23,15 +23,15 @@ import {
 import { TablaPaginacion } from "@/app/global/Components/Tabla.Paginacion";
 import { TablaEditorColumnas } from "@/app/global/Components/Tabla.EditorColumnas";
 
-interface TablaProductoProps<TData, TValue> {
+interface TablaProveedorProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export function TablaProducto<TData, TValue>({
+export function TablaProveedor<TData, TValue>({
   columns,
   data,
-}: Readonly<TablaProductoProps<TData, TValue>>) {
+}: Readonly<TablaProveedorProps<TData, TValue>>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -56,20 +56,20 @@ export function TablaProducto<TData, TValue>({
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
-            {headerGroup.headers.map((header) => {
-              const estilos = `w-[${header.getSize()}px]`
-              return (
-                <TableHead key={header.id}  className={estilos}>
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                </TableHead>
-              );
-            })}
-          </TableRow>
+              {headerGroup.headers.map((header) => {
+                const estilos = `w-[${header.getSize()}px]`
+                return (
+                  <TableHead key={header.id}  className={estilos}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                );
+              })}
+            </TableRow>
           ))}
         </TableHeader>
         <TableBody>

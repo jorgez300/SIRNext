@@ -3,53 +3,45 @@ import { Button } from "@/components/ui/button";
 
 import { ArrowUpDown, PlusIcon, Edit2Icon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { TablaClientes } from "./Components/Tabla";
-
 import { ColumnDef } from "@tanstack/react-table";
+import { Proveedor } from "@/domain/Models/Proveedores/Proveedor";
+import { useAdministraProveedorStore } from "./Store/AdministraProveedor.store";
+import { GetProveedorById, GetProveedores } from "@/domain/Services/ProveedorService";
+import { FiltroProveedor } from "@/domain/DTOs/Proveedores/FiltroProveedores";
+import FiltrosProveedor from "./Components/Filtros";
+import { TablaProveedor } from "./Components/Tabla";
+import MantenedorProveedor from "./Components/Mantenedor";
 
-import MantenedorCliente from "./Components/Mantenedor";
-import { Cliente } from "@/domain/Models/Clientes/Cliente";
-import { GetClienteById, GetClientes } from "@/domain/Services/ClienteService";
-import FiltrosCliente from "./Components/Filtros";
-import { FiltroCliente } from "@/domain/DTOs/Clientes/FiltroClientes";
-import { useAdministraClienteStore } from "./Store/AdmistraCliente.store";
-import { useCodPantallaStore } from "@/app/global/Store/CodPantalla.store";
 
-export default function ClientesPage() {
+
+
+export default function ProveedoresPage() {
   const [open, setOpen] = useState(false);
-  const [listaClientes, setListaClientes] = useState<Cliente[]>([]);
+  const [listaProveedores, setListaProveedores] = useState<Proveedor[]>([]);
 
-  const { RegistraCliente } = useAdministraClienteStore();
-
-  const { RegistraCodPantalla } = useCodPantallaStore();
-
+  const { RegistraProveedor } = useAdministraProveedorStore();
   useEffect(() => {
-    RegistraCodPantalla({
-      Codigo: "",
-      Version: "V 0.1",
-      Titulo: "Administrar Clientes",
-    });
     Buscar();
   }, []);
 
-  const Buscar = async (filtro?: FiltroCliente) => {
-    setListaClientes(await GetClientes(filtro));
+  const Buscar = async (filtro?: FiltroProveedor) => {
+    setListaProveedores(await GetProveedores(filtro));
   };
 
   const ModalVisible = async (flag: boolean, id?: string | undefined) => {
     if (!flag) {
-      await RegistraCliente(undefined);
+      await RegistraProveedor(undefined);
       setOpen(flag);
     } else if (!id) {
-      await RegistraCliente(undefined);
+      await RegistraProveedor(undefined);
       setOpen(flag);
     } else {
-      await RegistraCliente(await GetClienteById(id));
+      await RegistraProveedor(await GetProveedorById(id));
       setOpen(flag);
     }
   };
 
-  const columns: ColumnDef<Cliente>[] = [
+  const columns: ColumnDef<Proveedor>[] = [
     {
       accessorKey: "Identificacion",
       size: 300,
@@ -73,13 +65,13 @@ export default function ClientesPage() {
       header: "Acciones",
       size: 300,
       cell: ({ row }) => {
-        const cliente = row.original;
+        const item = row.original;
         return (
           <div className="grid grid-cols-2 gap-3 w-52">
             <Edit2Icon
               className="text-teal-600"
               onClick={async () => {
-                await ModalVisible(true, cliente.Id);
+                await ModalVisible(true, item.Id);
               }}
             />
           </div>
@@ -103,12 +95,14 @@ export default function ClientesPage() {
       </div>
 
       <div>
-        <FiltrosCliente Buscar={Buscar} />
+        <FiltrosProveedor Buscar={Buscar} />
       </div>
       <div className="w-full">
-        <TablaClientes columns={columns} data={listaClientes} />
+        <TablaProveedor columns={columns} data={listaProveedores} />
       </div>
-      {open ? <MantenedorCliente setOpen={ModalVisible} /> : <></>}
+      {open ? <MantenedorProveedor setOpen={ModalVisible} /> : <></>}
     </main>
   );
 }
+
+

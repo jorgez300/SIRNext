@@ -5,4 +5,5 @@ export type FiltroProducto = {
   Descripcion?: string;
   Vehiculo?: Vehiculo
   MarcaProd?: string;
+  ConExistencia?: boolean;
 };

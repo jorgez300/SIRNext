@@ -15,6 +15,7 @@ import { TablaProducto } from "./Components/Tabla";
 import { useRouter } from "next/navigation";
 import { EscanerProducto } from "@/app/global/Components/Camara";
 import { useAdministraProductoStore } from "../Store/AdmistraProducto.store";
+import { useCodPantallaStore } from "@/app/global/Store/CodPantalla.store";
 
 export default function ProductoPage() {
   const [listaModelosPorMarca, setListaModelosPorMarca] = useState<
@@ -28,8 +29,14 @@ export default function ProductoPage() {
   const { RegistraCodigo, ResetCodigo } = useAdministraProductoStore();
 
   const router = useRouter();
+  const { RegistraCodPantalla } = useCodPantallaStore();
 
   useEffect(() => {
+    RegistraCodPantalla({
+      Codigo: "",
+      Version: "V 0.1",
+      Titulo: "Listado de productos",
+    });
     ResetCodigo();
     Buscar();
     Listas();
@@ -79,6 +86,7 @@ export default function ProductoPage() {
     },
     {
       accessorKey: "Existencia",
+      size: 100,
       header: "Existencia",
     },
     {
@@ -87,14 +95,17 @@ export default function ProductoPage() {
     },
     {
       accessorKey: "Costo",
+      size: 100,
       header: "Costo",
     },
     {
       accessorKey: "Precio",
+      size: 100,
       header: "Precio",
     },
     {
       header: "Acciones",
+      size: 100,
       cell: ({ row }) => {
         const item = row.original;
         return (

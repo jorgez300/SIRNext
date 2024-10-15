@@ -57,8 +57,9 @@ export function TablaClientes<TData, TValue>({
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
+                const estilos = `w-[${header.getSize()}px]`;
                 return (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className={estilos}>
                     {header.isPlaceholder
                       ? null
                       : flexRender(
