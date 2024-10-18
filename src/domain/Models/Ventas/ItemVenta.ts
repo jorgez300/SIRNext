@@ -1,8 +1,9 @@
 export type ItemVenta = {
   VentaId: string;
-  InventarioId: string;
+  Posicion: number;
+  ProductoId: string;
   Cantidad: number;
+  Costo: number;
   Precio: number;
   Total?:number;
-  Posicion: number;
 };

@@ -24,71 +24,99 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import { z } from "zod";
-import {
-  MantenedorClienteDefault,
-  MantenedorClienteSchema,
-} from "../Schemas/MantenedorClientes.schema";
+import { MantenedorClienteSchema } from "../Schemas/MantenedorClientes.schema";
 
 import { Cliente } from "@/domain/Models/Clientes/Cliente";
-import { GuardaCliente } from "@/domain/Services/ClienteService";
+import {
+  ActualizaCliente,
+  GetClienteByIdentificacion,
+  InsertaCliente,
+} from "@/domain/Services/ClienteService";
+import { useAdministraClienteStore } from "../Store/AdmistraCliente.store";
 
 type MantenedorClienteProps = {
-  date: Date | undefined;
-  setDate: (date: Date | undefined) => void;
-  open: boolean;
   setOpen: (date: boolean) => void;
-  cliente?: Cliente;
 };
 
 export default function MantenedorCliente(
   props: Readonly<MantenedorClienteProps>
 ) {
+  const { Cliente, ResetCliente, RegistraCliente } =
+    useAdministraClienteStore();
+
+  let MantenedorClienteDefault = {
+    Identificacion: "",
+    Nombre: "",
+  };
+
+  if (Cliente) {
+    MantenedorClienteDefault = {
+      Identificacion: Cliente?.Identificacion,
+      Nombre: Cliente?.Nombre,
+    };
+  }
+
   const form = useForm<z.infer<typeof MantenedorClienteSchema>>({
     resolver: zodResolver(MantenedorClienteSchema),
     defaultValues: MantenedorClienteDefault,
   });
 
-  if (props.cliente) {
-    form.setValue("Identificacion", props.cliente.Identificacion!);
-    form.setValue("Nombre", props.cliente.Nombre!);
-  }
-
-  function handleClose() {
+  const handleClose = async () => {
     form.reset();
+    await ResetCliente();
     props.setOpen(false);
-  }
+  };
+
+  const ValidaExiste = async (Identificacion: string) => {
+    const data = await GetClienteByIdentificacion(Identificacion);
+
+    if (data) {
+      await RegistraCliente(data);
+      form.setValue("Identificacion", data.Identificacion);
+      form.setValue("Nombre", data.Nombre);
+    }
+  };
 
   function handleSubmit() {
-    form.trigger();
-    if (form.formState.isValid) {
-      const NewItem: Cliente = {
-        Id: props.cliente ? props.cliente.Id : undefined,
-        Identificacion: form.getValues("Identificacion"),
-        Nombre: form.getValues("Nombre"),
-      };
-      GuardaCliente(NewItem);
-      handleClose();
-    }
+    form.trigger().then(() => {
+      if (form.formState.isValid) {
+        const NewItem: Cliente = {
+          Id: Cliente ? Cliente.Id : undefined,
+          Identificacion: form.getValues("Identificacion"),
+          Nombre: form.getValues("Nombre"),
+        };
+        if (Cliente) {
+          ActualizaCliente(NewItem);
+        } else {
+          InsertaCliente(NewItem);
+        }
+
+        handleClose();
+      }
+    });
   }
 
   return (
-    <Dialog open={props.open} onOpenChange={props.setOpen}>
+    <Dialog defaultOpen={true}>
       <DialogContent
-        onPointerDownOutside={(e) => {
+        onInteractOutside={(e) => {
+          e.preventDefault();
+        }}
+        onEscapeKeyDown={(e) => {
           e.preventDefault();
         }}
         className="w-full max-w-6xl"
       >
         <DialogHeader>
-          <DialogTitle>{props.cliente ? "Editar" : "Nuevo"}</DialogTitle>
+          <DialogTitle>{Cliente ? "Editar" : "Nuevo"}</DialogTitle>
           <DialogDescription>Version</DialogDescription>
         </DialogHeader>
 
         <div>
           <Form {...form}>
             <form
-              action={async () => {
-                handleSubmit();
+              onSubmit={(e) => {
+                e.preventDefault();
               }}
               className="grid grid-cols-4 gap-4"
             >
@@ -97,9 +125,16 @@ export default function MantenedorCliente(
                 name="Identificacion"
                 render={({ field }) => (
                   <FormItem className="col-span-4 ">
-                    <FormLabel>Titulo</FormLabel>
+                    <FormLabel>Identificacion</FormLabel>
                     <FormControl>
-                      <Input placeholder="Identificacion" {...field} />
+                      <Input
+                        placeholder="Identificacion"
+                        {...field}
+                        disabled={Cliente ? true : false}
+                        onBlur={async (e) => {
+                          await ValidaExiste(e.target.value.toUpperCase());
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -110,7 +145,7 @@ export default function MantenedorCliente(
                 name="Nombre"
                 render={({ field }) => (
                   <FormItem className="col-span-4 ">
-                    <FormLabel>Url</FormLabel>
+                    <FormLabel>Nombre</FormLabel>
                     <FormControl>
                       <Input placeholder="Nombre" {...field} />
                     </FormControl>

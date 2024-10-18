@@ -57,8 +57,9 @@ export function TablaClientes<TData, TValue>({
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
+                const estilos = `w-[${header.getSize()}px]`;
                 return (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className={estilos}>
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -76,6 +77,7 @@ export function TablaClientes<TData, TValue>({
             table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
+                className="even:bg-zinc-50 odd:bg-white"
                 data-state={row.getIsSelected() && "selected"}
               >
                 {row.getVisibleCells().map((cell) => (

@@ -1,6 +1,9 @@
+import { Vehiculo } from "@/domain/Models/Vehiculos/Vehiculo";
+
 export type FiltroProducto = {
   Codigo?: string;
   Descripcion?: string;
-  Marca?: string;
-  Modelo?: string;
+  Vehiculo?: Vehiculo
+  MarcaProd?: string;
+  ConExistencia?: boolean;
 };

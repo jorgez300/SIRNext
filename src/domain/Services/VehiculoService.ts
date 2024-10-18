@@ -1087,7 +1087,7 @@ export const GetVehiculosPorProducto = async (Codigo?: string) => {
 
   query = `SELECT pv.marca, pv.modelo, pv.desde, pv.hasta
             FROM public.productos p left join public.productosvehiculos pv on p.codigo = pv.codigo
-            WHERE p.codigo = '${Codigo}'`;
+            WHERE p.codigo = UPPER('${Codigo}')`;
 
   const data = await GetCursor(query);
   data.forEach((item) => {
@@ -1105,7 +1105,7 @@ export const GetVehiculosPorProducto = async (Codigo?: string) => {
 
 export const EliminaVehiculosPorProducto = async (Codigo?: string) => {
   const query = `DELETE FROM Public.ProductosVehiculos 
-                    WHERE Codigo = '${Codigo}'`;
+                    WHERE Codigo = UPPER('${Codigo}')`;
 
   await ExecQuery(query);
 };
@@ -1122,7 +1122,7 @@ export const InsertaVehiculosPorProducto = async (
   const reg: string[] = [];
   vehiculos.forEach((item) => {
     reg.push(
-      ` ('${Codigo}', '${item.Marca}', '${item.Modelo}', ${
+      ` (UPPER('${Codigo}'), '${item.Marca}', '${item.Modelo}', ${
         item.Desde ?? "NULL"
       }, ${item.Desde ?? "NULL"}) `
     );

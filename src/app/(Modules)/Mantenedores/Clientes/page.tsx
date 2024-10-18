@@ -1,57 +1,59 @@
 "use client";
 import { Button } from "@/components/ui/button";
 
-import { ArrowUpDown, PlusIcon, Edit2Icon, Trash2Icon } from "lucide-react";
+import { ArrowUpDown, PlusIcon, Edit2Icon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { TablaClientes } from "./Components/Tabla";
 
 import { ColumnDef } from "@tanstack/react-table";
 
-import MantenedorLink from "./Components/Mantenedor";
+import MantenedorCliente from "./Components/Mantenedor";
 import { Cliente } from "@/domain/Models/Clientes/Cliente";
 import { GetClienteById, GetClientes } from "@/domain/Services/ClienteService";
 import FiltrosCliente from "./Components/Filtros";
 import { FiltroCliente } from "@/domain/DTOs/Clientes/FiltroClientes";
+import { useAdministraClienteStore } from "./Store/AdmistraCliente.store";
+import { useCodPantallaStore } from "@/app/global/Store/CodPantalla.store";
 
 export default function ClientesPage() {
-  const [date, setDate] = useState<Date | undefined>();
   const [open, setOpen] = useState(false);
   const [listaClientes, setListaClientes] = useState<Cliente[]>([]);
-  const [cliente, setCliente] = useState<Cliente | undefined>();
+
+  const { RegistraCliente } = useAdministraClienteStore();
+
+  const { RegistraCodPantalla } = useCodPantallaStore();
 
   useEffect(() => {
+    RegistraCodPantalla({
+      Codigo: "",
+      Version: "V 0.1",
+      Titulo: "Administrar Clientes",
+    });
     Buscar();
   }, []);
 
-  const Buscar = (filtro?: FiltroCliente) => {
-    GetClientes(filtro).then((result) => {
-      setListaClientes(result);
-    });
+  const Buscar = async (filtro?: FiltroCliente) => {
+    setListaClientes(await GetClientes(filtro));
   };
 
-  const ModalVisible = (flag: boolean, id?: string | undefined) => {
+  const ModalVisible = async (flag: boolean, id?: string | undefined) => {
     if (!flag) {
-      setCliente(undefined);
+      await RegistraCliente(undefined);
+      await Buscar();
       setOpen(flag);
-    }
-    if (id == undefined) {
-      setCliente(undefined);
+    } else if (!id) {
+      await RegistraCliente(undefined);
       setOpen(flag);
     } else {
-      GetClienteById(id).then((result) => {
-        setCliente(result);
-        setOpen(flag);
-      });
+      await RegistraCliente(await GetClienteById(id));
+      setOpen(flag);
     }
-  };
-
-  const SaveDate = (fecha: Date | undefined) => {
-    setDate(fecha);
   };
 
   const columns: ColumnDef<Cliente>[] = [
     {
       accessorKey: "Identificacion",
+      size: 300,
       header: "Identificacion",
     },
     {
@@ -70,20 +72,15 @@ export default function ClientesPage() {
     },
     {
       header: "Acciones",
+      size: 300,
       cell: ({ row }) => {
         const cliente = row.original;
         return (
           <div className="grid grid-cols-2 gap-3 w-52">
             <Edit2Icon
               className="text-teal-600"
-              onClick={() => {
-                ModalVisible(true, cliente.Id);
-              }}
-            />
-            <Trash2Icon
-              className="text-teal-600"
-              onClick={() => {
-                alert(cliente.Id);
+              onClick={async () => {
+                await ModalVisible(true, cliente.Id);
               }}
             />
           </div>
@@ -112,13 +109,7 @@ export default function ClientesPage() {
       <div className="w-full">
         <TablaClientes columns={columns} data={listaClientes} />
       </div>
-      <MantenedorLink
-        open={open}
-        setOpen={ModalVisible}
-        setDate={SaveDate}
-        date={date}
-        cliente={cliente}
-      />
+      {open ? <MantenedorCliente setOpen={ModalVisible} /> : <></>}
     </main>
   );
 }

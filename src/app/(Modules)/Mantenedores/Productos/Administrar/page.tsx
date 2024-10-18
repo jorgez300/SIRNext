@@ -49,6 +49,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useRouter } from "next/navigation";
 import { useAdministraProductoStore } from "../Store/AdmistraProducto.store";
 import { AlertaAceptarCancelar } from "@/app/global/Components/Alertas.Confirmacion";
+import { useCodPantallaStore } from "@/app/global/Store/CodPantalla.store";
 
 export default function MantenedorProductoPage() {
   const form = useForm<z.infer<typeof MantenedorProductoSchema>>({
@@ -72,9 +73,15 @@ export default function MantenedorProductoPage() {
 
   const router = useRouter();
 
-  const { Codigo } = useAdministraProductoStore();
+  const { Codigo, RegistraCodigo } = useAdministraProductoStore();
+  const { RegistraCodPantalla } = useCodPantallaStore();
 
   useEffect(() => {
+    RegistraCodPantalla({
+      Codigo: "",
+      Version: "V 0.1",
+      Titulo: "Administrar productos",
+    });
     Listas();
     isEdit();
   }, []);
@@ -86,10 +93,12 @@ export default function MantenedorProductoPage() {
   const isEdit = async () => {
     form.setValue("Vigente", true);
     if (Codigo) {
-      const Item = await GetProductoById(Codigo);
+      const Item = await GetProductoById(Codigo!);
       if (Item) {
         form.setValue("Codigo", Item.Codigo);
         form.setValue("Descripcion", Item.Descripcion);
+        form.setValue("MarcaProd", Item.MarcaProd ?? "");
+        form.setValue("Ubicacion", Item.Ubicacion ?? "");
         form.setValue("Existencia", Item.Existencia);
         form.setValue("Costo", Item.Costo);
         form.setValue("Precio", Item.Precio);
@@ -97,6 +106,24 @@ export default function MantenedorProductoPage() {
       }
       setProducto(Item);
       setVehiculos(await GetVehiculosPorProducto(Codigo));
+    }
+  };
+
+  const CodigoExiste = async () => {
+    const Item = await GetProductoById(form.getValues("Codigo"));
+
+    if (Item) {
+      await RegistraCodigo(Item.Codigo);
+      form.setValue("Codigo", Item.Codigo);
+      form.setValue("Descripcion", Item.Descripcion);
+      form.setValue("MarcaProd", Item.MarcaProd ?? "");
+      //form.setValue("Ubicacion", Item.Ubicacion ?? "");
+      form.setValue("Existencia", Item.Existencia);
+      form.setValue("Costo", Item.Costo);
+      form.setValue("Precio", Item.Precio);
+      form.setValue("Vigente", Item.Vigente!);
+      setProducto(Item);
+      setVehiculos(await GetVehiculosPorProducto(Item.Codigo));
     }
   };
 
@@ -147,32 +174,57 @@ export default function MantenedorProductoPage() {
     router.push("/Mantenedores/Productos/Lista");
   }
 
+  const GuardarProducto = () => {
+    if (form.formState.isValid) {
+      const NewItem: Producto = {
+        //Id: props.producto ? props.producto.Item!.Id : undefined,
+        Codigo: form.getValues("Codigo"),
+        Descripcion: form.getValues("Descripcion"),
+        MarcaProd: form.getValues("MarcaProd"),
+        Ubicacion: form.getValues("Ubicacion"),
+        Vigente: form.getValues("Vigente"),
+        Existencia: form.getValues("Existencia"),
+        Costo: form.getValues("Costo"),
+        Precio: form.getValues("Precio"),
+      };
+      if (Codigo) {
+        ActualizaProducto({
+          Item: NewItem,
+          Vehiculos: vehiculos,
+        });
+      } else {
+        InsertaProducto({
+          Item: NewItem,
+          Vehiculos: vehiculos,
+        });
+      }
+
+      handleClose();
+    }
+  };
+
   const handleSubmit = async () => {
     form.trigger().then(() => {
       if (form.formState.isValid) {
-        const NewItem: Producto = {
-          //Id: props.producto ? props.producto.Item!.Id : undefined,
-          Codigo: form.getValues("Codigo"),
-          Descripcion: form.getValues("Descripcion"),
-          Vigente: form.getValues("Vigente"),
-          Existencia: form.getValues("Existencia"),
-          Costo: form.getValues("Costo"),
-          Precio: form.getValues("Precio"),
-        };
-        if (Codigo) {
-          ActualizaProducto({
-            Item: NewItem,
-            Vehiculos: vehiculos,
-          });
-        } else {
-          InsertaProducto({
-            Item: NewItem,
-            Vehiculos: vehiculos,
-          });
-        }
-
-        handleClose();
+        ConfirmacionVisible(true);
       }
+    });
+  };
+
+  const GeneraUbicacion = () => {
+    const cont = [];
+
+    for (let i = 1; i <= 50; i++) {
+      cont.push(i);
+    }
+
+    return cont.map((i) => {
+      return (
+        <SelectItem
+          key={`Ubicacion${i}`}
+          value={`${i}`}
+        >{`Estante ${i}`}</SelectItem>
+      );
     });
   };
 
@@ -232,7 +284,7 @@ export default function MantenedorProductoPage() {
   };
 
   const ConfirmacionAceptar = () => {
-    handleSubmit();
+    GuardarProducto();
     setConfirmacion(false);
   };
 
@@ -243,7 +295,7 @@ export default function MantenedorProductoPage() {
   return (
     <main className="grid grid-cols-1 gap-3 p-4">
       <Form {...form}>
-        <form className="grid grid-cols-4 gap-4">
+        <form className="grid grid-cols-4 gap-2">
           <FormField
             control={form.control}
             name="Codigo"
@@ -255,6 +307,9 @@ export default function MantenedorProductoPage() {
                     disabled={producto ? true : false}
                     placeholder="Codigo"
                     {...field}
+                    onBlur={async () => {
+                      await CodigoExiste();
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
@@ -284,6 +339,39 @@ export default function MantenedorProductoPage() {
                   <Textarea placeholder="Descripcion" {...field} />
                 </FormControl>
                 <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="MarcaProd"
+            render={({ field }) => (
+              <FormItem className="col-span-2">
+                <FormLabel>Marca Producto</FormLabel>
+                <FormControl>
+                  <Input placeholder="Marca Producto" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="Ubicacion"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Ubicacion</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccione ubicacion" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>{GeneraUbicacion()}</SelectContent>
+                </Select>
               </FormItem>
             )}
           />
@@ -349,7 +437,7 @@ export default function MantenedorProductoPage() {
         <div className="grid grid-cols-2">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="Marca">Marca</Label>
+              <Label htmlFor="Marca">Marca Vehiculo</Label>
               <Select
                 value={marcaSeleccionada}
                 onValueChange={(e) => {
@@ -375,7 +463,7 @@ export default function MantenedorProductoPage() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="Modelo">Modelo</Label>
+              <Label htmlFor="Modelo">Modelo Vehiculo</Label>
               <Select
                 value={modeloSeleccionado}
                 onValueChange={(e) => {
@@ -443,7 +531,9 @@ export default function MantenedorProductoPage() {
             </div>
             <div className="flex items-end gap-4">
               <Button onClick={agregaVehiculo}>Agregar</Button>
-              <Button onClick={limpiaVehiculos}>Limpiar</Button>
+              <Button variant="destructive" onClick={limpiaVehiculos}>
+                Limpiar
+              </Button>
             </div>
           </div>
           <div className="px-4">
@@ -470,14 +560,15 @@ export default function MantenedorProductoPage() {
         <Button
           className="bg-teal-600 ml-2"
           onClick={async () => {
-            ConfirmacionVisible(true);
+            handleSubmit();
           }}
         >
           <SaveAll className="mr-2" />
           Guardar
         </Button>
         <Button
-          className="bg-teal-600 ml-2"
+          variant="destructive"
+          className="ml-2"
           onClick={async () => {
             handleClose();
           }}

@@ -6,7 +6,6 @@ import { Costo } from "../Models/Costos/Costo";
 
 
 export const GetCostos = async (filtro?: FiltroCosto) => {
-  console.log("GetCostos", filtro);
   const Lista: Costo[] = [
     {
       Id: "1",
@@ -21,7 +20,6 @@ export const GetCostos = async (filtro?: FiltroCosto) => {
 };
 
 export const GetCostoById = async (id: string) => {
-  console.log("GetCostoById", id);
   const Item: Costo =
     {
         Id: "1",

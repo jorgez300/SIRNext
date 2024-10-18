@@ -1,4 +1,3 @@
-import { Cliente } from "@/domain/Models/Clientes/Cliente";
 import { z } from "zod";
 
 export const MantenedorClienteSchema = z.object({
@@ -12,8 +11,7 @@ export const MantenedorClienteSchema = z.object({
     .max(50, "Maximo 50 caracteres"),
 });
 
-export const MantenedorClienteDefault: Cliente = {
-  Id: "",
+export const MantenedorClienteDefault = {
   Identificacion: "",
   Nombre: "",
 };
