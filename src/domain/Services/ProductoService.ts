@@ -98,20 +98,20 @@ export const GetProductosOperacion = async (
 export const GetProductoById = async (
   id: string
 ): Promise<Producto | undefined> => {
-  const query = `SELECT Codigo, Descripcion, marcaprod, Vigente, existencia, costo, precio, minimo, maximo 
+  const query = `SELECT Codigo, Descripcion, marcaprod, Vigente, existencia, costo, precio, minimo, maximo , Ubicacion 
                 FROM public.productos 
-                WHERE Codigo = '${id}'`;
+                WHERE Codigo = UPPER('${id}')`;
 
   const data = await GetCursor(query);
 
   if (data.length == 0) {
     return undefined;
   }
-
   return {
     Codigo: data[0].codigo,
     Descripcion: data[0].descripcion,
     MarcaProd: data[0].marcaprod,
+    Ubicacion: data[0].ubicacion,
     Existencia: data[0].existencia,
     Vigente: data[0].vigente,
     Costo: data[0].costo,
@@ -126,13 +126,14 @@ export const ActualizaProducto = async (Producto: ProductoCompleto) => {
             SET 
               descripcion='${Producto.Item!.Descripcion}', 
               marcaprod='${Producto.Item!.MarcaProd}', 
+              ubicacion='${Producto.Item!.Ubicacion}', 
               vigente=${Producto.Item!.Vigente}, 
               existencia=${Producto.Item!.Existencia}, 
               costo=${Producto.Item!.Costo}, 
               precio=${Producto.Item!.Precio}, 
               minimo=${Producto.Item!.Minimo ?? "NULL"}, 
               maximo=${Producto.Item!.Maximo ?? "NULL"}
-            WHERE codigo = '${Producto.Item!.Codigo ?? ""}'`;
+            WHERE codigo = UPPER('${Producto.Item!.Codigo ?? ""}')`;
 
   await ExecQuery(query);
 
@@ -142,11 +143,12 @@ export const ActualizaProducto = async (Producto: ProductoCompleto) => {
 export const InsertaProducto = async (Producto: ProductoCompleto) => {
   await EliminaVehiculosPorProducto(Producto.Item!.Codigo);
 
-  const query = `INSERT INTO Productos (Codigo, Descripcion, MarcaProd, Vigente, Existencia, Costo, Precio, Minimo, Maximo) VALUES
+  const query = `INSERT INTO Productos (Codigo, Descripcion, MarcaProd, ubicacion, Vigente, Existencia, Costo, Precio, Minimo, Maximo) VALUES
                   (
-                    '${Producto.Item!.Codigo}', 
+                    UPPER('${Producto.Item!.Codigo}'), 
                     '${Producto.Item!.Descripcion}', 
                     '${Producto.Item!.MarcaProd}', 
+                    '${Producto.Item!.Ubicacion}', 
                     ${Producto.Item!.Vigente}, 
                     ${Producto.Item!.Existencia}, 
                     ${Producto.Item!.Costo}, 
@@ -169,7 +171,7 @@ export const ActualizaExistenciaProducto = async (
   const query = `UPDATE public.productos
             SET 
               existencia= existencia ${Operacion} ${Cantidad}
-            WHERE codigo = '${ProductoId}'`;
+            WHERE codigo = UPPER('${ProductoId}')`;
 
   await ExecQuery(query);
 };

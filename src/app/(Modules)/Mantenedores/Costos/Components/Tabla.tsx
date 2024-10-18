@@ -76,6 +76,7 @@ export function TablaCosto<TData, TValue>({
             table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
+                className="even:bg-zinc-50 odd:bg-white"
                 data-state={row.getIsSelected() && "selected"}
               >
                 {row.getVisibleCells().map((cell) => (

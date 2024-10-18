@@ -90,9 +90,31 @@ export const GetClienteById = async (
   };
 };
 
+export const GetClienteByIdentificacion = async (
+  id: string
+): Promise<Cliente | undefined> => {
+  const query = `SELECT id, identificacion, nombre
+                  FROM public.clientes
+                  WHERE 
+                  identificacion =  upper('${id}')
+                  LIMIT 1`;
+
+  const data = await GetCursor(query);
+
+  if (data.length == 0) {
+    return undefined;
+  }
+
+  return {
+    Id: data[0].id,
+    Identificacion: data[0].identificacion,
+    Nombre: data[0].nombre,
+  };
+};
+
 export const ActualizaCliente = async (Cliente: Cliente) => {
   const query = `UPDATE public.clientes SET 
-                  identificacion='${Cliente.Identificacion}', 
+                  identificacion='${Cliente.Identificacion.toUpperCase()}', 
                   nombre='${Cliente.Nombre}'
                 WHERE id=${Cliente.Id}`;
 
@@ -101,7 +123,9 @@ export const ActualizaCliente = async (Cliente: Cliente) => {
 
 export const InsertaCliente = async (Cliente: Cliente) => {
   const query = `INSERT INTO public.clientes(identificacion, nombre) VALUES 
-                ('${Cliente.Identificacion}', '${Cliente.Nombre}')`;
+                ('${Cliente.Identificacion.toUpperCase()}', '${
+    Cliente.Nombre
+  }')`;
 
   await ExecQuery(query);
 };

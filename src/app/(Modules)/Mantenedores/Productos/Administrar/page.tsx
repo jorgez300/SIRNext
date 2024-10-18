@@ -98,6 +98,7 @@ export default function MantenedorProductoPage() {
         form.setValue("Codigo", Item.Codigo);
         form.setValue("Descripcion", Item.Descripcion);
         form.setValue("MarcaProd", Item.MarcaProd ?? "");
+        form.setValue("Ubicacion", Item.Ubicacion ?? "");
         form.setValue("Existencia", Item.Existencia);
         form.setValue("Costo", Item.Costo);
         form.setValue("Precio", Item.Precio);
@@ -116,6 +117,7 @@ export default function MantenedorProductoPage() {
       form.setValue("Codigo", Item.Codigo);
       form.setValue("Descripcion", Item.Descripcion);
       form.setValue("MarcaProd", Item.MarcaProd ?? "");
+      //form.setValue("Ubicacion", Item.Ubicacion ?? "");
       form.setValue("Existencia", Item.Existencia);
       form.setValue("Costo", Item.Costo);
       form.setValue("Precio", Item.Precio);
@@ -179,6 +181,7 @@ export default function MantenedorProductoPage() {
         Codigo: form.getValues("Codigo"),
         Descripcion: form.getValues("Descripcion"),
         MarcaProd: form.getValues("MarcaProd"),
+        Ubicacion: form.getValues("Ubicacion"),
         Vigente: form.getValues("Vigente"),
         Existencia: form.getValues("Existencia"),
         Costo: form.getValues("Costo"),
@@ -205,6 +208,23 @@ export default function MantenedorProductoPage() {
       if (form.formState.isValid) {
         ConfirmacionVisible(true);
       }
+    });
+  };
+
+  const GeneraUbicacion = () => {
+    const cont = [];
+
+    for (let i = 1; i <= 50; i++) {
+      cont.push(i);
+    }
+
+    return cont.map((i) => {
+      return (
+        <SelectItem
+          key={`Ubicacion${i}`}
+          value={`${i}`}
+        >{`Estante ${i}`}</SelectItem>
+      );
     });
   };
 
@@ -332,6 +352,26 @@ export default function MantenedorProductoPage() {
                   <Input placeholder="Marca Producto" {...field} />
                 </FormControl>
                 <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="Ubicacion"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Ubicacion</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccione ubicacion" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>{GeneraUbicacion()}</SelectContent>
+                </Select>
               </FormItem>
             )}
           />

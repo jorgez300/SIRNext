@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { PlusIcon, Trash, Trash2Icon } from "lucide-react";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { RegistroVenta } from "@/domain/DTOs/Ventas/RegistroVenta";
 import { Input } from "@/components/ui/input";
 
@@ -21,6 +21,9 @@ import { Producto } from "@/domain/Models/Productos/Producto";
 import { Cliente } from "@/domain/Models/Clientes/Cliente";
 import { AlertaAceptarCancelar } from "@/app/global/Components/Alertas.Confirmacion";
 import { InsertaOperacionVenta } from "@/domain/Services/VentaService";
+import { Label } from "@/components/ui/label";
+import { toast, Toaster } from "sonner";
+import { useCodPantallaStore } from "@/app/global/Store/CodPantalla.store";
 
 export default function OperacionVentaPage() {
   const [modalProductos, setModalProductos] = React.useState<boolean>(false);
@@ -29,6 +32,17 @@ export default function OperacionVentaPage() {
     React.useState<boolean>(false);
   const [cliente, setCliente] = React.useState<Cliente>();
   const [data, setData] = React.useState<RegistroVenta[]>([]);
+  const [ultimaOperacion, setUltimaOperacion] = React.useState<string>();
+
+  const { RegistraCodPantalla } = useCodPantallaStore();
+
+  useEffect(() => {
+    RegistraCodPantalla({
+      Codigo: "",
+      Version: "V 0.1",
+      Titulo: "Operacion de venta",
+    });
+  }, []);
 
   const Totalizar = async () => {
     const mensaje = [];
@@ -44,10 +58,12 @@ export default function OperacionVentaPage() {
     }
 
     if (mensaje.length > 0) {
-      alert(mensaje.join(", "));
+      toast("Error", {
+        description: mensaje.join(", ")
+      });
       return;
     } else {
-      await InsertaOperacionVenta(data, cliente!);
+      setUltimaOperacion(await InsertaOperacionVenta(data, cliente!));
       Limpiar();
     }
 
@@ -162,9 +178,9 @@ export default function OperacionVentaPage() {
         <div>
           <Input
             readOnly
-            value={`${cliente?.Identificacion ?? ""} - ${
-              cliente?.Nombre ?? ""
-            }`}
+            value={
+              cliente ? `${cliente?.Identificacion} - ${cliente?.Nombre}` : ""
+            }
           />
         </div>
         <div>
@@ -209,7 +225,13 @@ export default function OperacionVentaPage() {
           </div>
         </div>
       </div>
-
+      <div className="w-full">
+        {ultimaOperacion ? (
+          <Label>Ultima Operacion: {ultimaOperacion}</Label>
+        ) : (
+          <></>
+        )}
+      </div>
       <div className="w-full">
         <Table>
           <TableHeader>
@@ -224,7 +246,7 @@ export default function OperacionVentaPage() {
           </TableHeader>
           <TableBody>
             {data.map((itemVenta) => (
-              <TableRow key={itemVenta.Posicion}>
+              <TableRow className="even:bg-zinc-50 odd:bg-white" key={itemVenta.Posicion}>
                 <TableCell>
                   <Trash2Icon
                     className="text-teal-600"
@@ -309,6 +331,7 @@ export default function OperacionVentaPage() {
         setOpen={ConfirmaTotalizarVisible}
         open={confirmacionTotalizar}
       />
+      <Toaster />
     </main>
   );
 }

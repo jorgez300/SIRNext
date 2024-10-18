@@ -39,6 +39,7 @@ export default function ClientesPage() {
   const ModalVisible = async (flag: boolean, id?: string | undefined) => {
     if (!flag) {
       await RegistraCliente(undefined);
+      await Buscar();
       setOpen(flag);
     } else if (!id) {
       await RegistraCliente(undefined);

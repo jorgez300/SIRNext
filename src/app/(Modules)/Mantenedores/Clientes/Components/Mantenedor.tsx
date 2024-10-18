@@ -29,6 +29,7 @@ import { MantenedorClienteSchema } from "../Schemas/MantenedorClientes.schema";
 import { Cliente } from "@/domain/Models/Clientes/Cliente";
 import {
   ActualizaCliente,
+  GetClienteByIdentificacion,
   InsertaCliente,
 } from "@/domain/Services/ClienteService";
 import { useAdministraClienteStore } from "../Store/AdmistraCliente.store";
@@ -40,7 +41,8 @@ type MantenedorClienteProps = {
 export default function MantenedorCliente(
   props: Readonly<MantenedorClienteProps>
 ) {
-  const { Cliente, ResetCliente } = useAdministraClienteStore();
+  const { Cliente, ResetCliente, RegistraCliente } =
+    useAdministraClienteStore();
 
   let MantenedorClienteDefault = {
     Identificacion: "",
@@ -63,6 +65,16 @@ export default function MantenedorCliente(
     form.reset();
     await ResetCliente();
     props.setOpen(false);
+  };
+
+  const ValidaExiste = async (Identificacion: string) => {
+    const data = await GetClienteByIdentificacion(Identificacion);
+
+    if (data) {
+      await RegistraCliente(data);
+      form.setValue("Identificacion", data.Identificacion);
+      form.setValue("Nombre", data.Nombre);
+    }
   };
 
   function handleSubmit() {
@@ -115,7 +127,14 @@ export default function MantenedorCliente(
                   <FormItem className="col-span-4 ">
                     <FormLabel>Identificacion</FormLabel>
                     <FormControl>
-                      <Input placeholder="Identificacion" {...field} />
+                      <Input
+                        placeholder="Identificacion"
+                        {...field}
+                        disabled={Cliente ? true : false}
+                        onBlur={async (e) => {
+                          await ValidaExiste(e.target.value.toUpperCase());
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

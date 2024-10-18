@@ -11,6 +11,7 @@ import { FiltroProveedor } from "@/domain/DTOs/Proveedores/FiltroProveedores";
 import FiltrosProveedor from "./Components/Filtros";
 import { TablaProveedor } from "./Components/Tabla";
 import MantenedorProveedor from "./Components/Mantenedor";
+import { useCodPantallaStore } from "@/app/global/Store/CodPantalla.store";
 
 
 
@@ -18,9 +19,14 @@ import MantenedorProveedor from "./Components/Mantenedor";
 export default function ProveedoresPage() {
   const [open, setOpen] = useState(false);
   const [listaProveedores, setListaProveedores] = useState<Proveedor[]>([]);
-
+  const { RegistraCodPantalla } = useCodPantallaStore();
   const { RegistraProveedor } = useAdministraProveedorStore();
   useEffect(() => {
+    RegistraCodPantalla({
+      Codigo: "",
+      Version: "V 0.1",
+      Titulo: "Administrar Proveedores",
+    });
     Buscar();
   }, []);
 
@@ -31,6 +37,7 @@ export default function ProveedoresPage() {
   const ModalVisible = async (flag: boolean, id?: string | undefined) => {
     if (!flag) {
       await RegistraProveedor(undefined);
+      await Buscar();
       setOpen(flag);
     } else if (!id) {
       await RegistraProveedor(undefined);

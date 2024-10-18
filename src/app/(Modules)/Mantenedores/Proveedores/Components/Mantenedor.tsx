@@ -27,8 +27,11 @@ import { z } from "zod";
 import { useAdministraProveedorStore } from "../Store/AdministraProveedor.store";
 import { MantenedorProveedorSchema } from "../Schemas/MantenedorProveedor.schema";
 import { Proveedor } from "@/domain/Models/Proveedores/Proveedor";
-import { ActualizaProveedor, InsertaProveedor } from "@/domain/Services/ProveedorService";
-
+import {
+  ActualizaProveedor,
+  GetProveedorByIdentificacion,
+  InsertaProveedor,
+} from "@/domain/Services/ProveedorService";
 
 type MantenedorProveedorProps = {
   setOpen: (date: boolean) => void;
@@ -37,7 +40,8 @@ type MantenedorProveedorProps = {
 export default function MantenedorProveedor(
   props: Readonly<MantenedorProveedorProps>
 ) {
-  const { Proveedor, ResetProveedor } = useAdministraProveedorStore();
+  const { Proveedor, ResetProveedor, RegistraProveedor } =
+    useAdministraProveedorStore();
 
   let MantenedorProveedorDefault = {
     Identificacion: "",
@@ -60,6 +64,16 @@ export default function MantenedorProveedor(
     form.reset();
     await ResetProveedor();
     props.setOpen(false);
+  };
+
+  const ValidaExiste = async (Identificacion: string) => {
+    const data = await GetProveedorByIdentificacion(Identificacion);
+
+    if (data) {
+      await RegistraProveedor(data);
+      form.setValue("Identificacion", data.Identificacion);
+      form.setValue("Nombre", data.Nombre);
+    }
   };
 
   function handleSubmit() {
@@ -112,7 +126,14 @@ export default function MantenedorProveedor(
                   <FormItem className="col-span-4 ">
                     <FormLabel>Identificacion</FormLabel>
                     <FormControl>
-                      <Input placeholder="Identificacion" {...field} />
+                      <Input
+                        placeholder="Identificacion"
+                        {...field}
+                        disabled={Proveedor ? true : false}
+                        onBlur={async (e) => {
+                          await ValidaExiste(e.target.value.toUpperCase());
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -18,27 +18,29 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { FiltroCliente } from "@/domain/DTOs/Clientes/FiltroClientes";
-import { Cliente } from "@/domain/Models/Clientes/Cliente";
-import { GetClientesOperacion } from "@/domain/Services/ClienteService";
+
+import { FiltroProveedor } from "@/domain/DTOs/Proveedores/FiltroProveedores";
+import { Proveedor } from "@/domain/Models/Proveedores/Proveedor";
+
+import { GetProveedoresOperacion } from "@/domain/Services/ProveedorService";
 import { useState } from "react";
 
-type ModalClienteProps = {
+type ModalProveedorProps = {
   setOpen: (date: boolean) => void;
-  ItemSeleccionado: (item: Cliente) => void;
+  ItemSeleccionado: (item: Proveedor) => void;
 };
 
-export default function ModalClientes(props: Readonly<ModalClienteProps>) {
-  const [data, setData] = useState<Cliente[]>([]);
+export default function ModalProveedor(props: Readonly<ModalProveedorProps>) {
+  const [data, setData] = useState<Proveedor[]>([]);
   const [buscar, setBuscar] = useState<string>("");
 
   const Buscar = async () => {
     if (buscar.length >= 3) {
-      const filtro: FiltroCliente = {
+      const filtro: FiltroProveedor = {
         Nombre: buscar,
         Identificacion: buscar,
       };
-      setData(await GetClientesOperacion(filtro));
+      setData(await GetProveedoresOperacion(filtro));
     } else {
       alert("Minimo de 3 caracteres para busqueda");
     }
@@ -56,7 +58,7 @@ export default function ModalClientes(props: Readonly<ModalClienteProps>) {
         style={{ maxWidth: "50vw" }}
       >
         <SheetHeader>
-          <SheetTitle>Buscar clientes</SheetTitle>
+          <SheetTitle>Buscar proveedor</SheetTitle>
           <SheetDescription></SheetDescription>
         </SheetHeader>
         <div className="grid grid-cols-2 gap-4 py-4">

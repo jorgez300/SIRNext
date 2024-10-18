@@ -23,15 +23,15 @@ import {
 import { TablaPaginacion } from "@/app/global/Components/Tabla.Paginacion";
 import { TablaEditorColumnas } from "@/app/global/Components/Tabla.EditorColumnas";
 
-interface TablaProductoProps<TData, TValue> {
+interface TablaVentasProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export function TablaProducto<TData, TValue>({
+export function TablaVentas<TData, TValue>({
   columns,
   data,
-}: Readonly<TablaProductoProps<TData, TValue>>) {
+}: Readonly<TablaVentasProps<TData, TValue>>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -76,8 +76,8 @@ export function TablaProducto<TData, TValue>({
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
-                key={row.id}
                 className="even:bg-zinc-50 odd:bg-white"
+                key={row.id}
                 data-state={row.getIsSelected() && "selected"}
               >
                 {row.getVisibleCells().map((cell) => (

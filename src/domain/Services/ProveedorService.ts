@@ -90,6 +90,27 @@ export const GetProveedorById = async (
   };
 };
 
+export const GetProveedorByIdentificacion = async (
+  id: string
+): Promise<Proveedor | undefined> => {
+  const query = `SELECT id, identificacion, nombre
+                  FROM public.proveedores
+                  WHERE 
+                  identificacion =  upper('${id}')
+                  LIMIT 1`;
+  const data = await GetCursor(query);
+
+  if (data.length == 0) {
+    return undefined;
+  }
+
+  return {
+    Id: data[0].id,
+    Identificacion: data[0].identificacion,
+    Nombre: data[0].nombre,
+  };
+};
+
 export const ActualizaProveedor = async (item: Proveedor) => {
   const query = `UPDATE public.proveedores SET 
                   identificacion='${item.Identificacion}', 
