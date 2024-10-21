@@ -11,22 +11,27 @@ export const GetModelosPorMarca = async () => {
       Modelos: [
         "Aveo 1.6",
         "Luv Dmax 3.5",
-        "Silverado 5.3",
-        "Rey Camion 6.0",
         "Optra",
+        "Rey Camion 6.0",
+        "Silverado 5.3",
       ],
     },
     {
       Marca: "Ford",
       Modelos: [
+        "Ecosport Titanium",
         "Explorer Eddi Bauer 4.6 3v",
         "Explorer Limited 3.5",
-        "FX4 5.4 3v",
-        "Triton F350 5.4 2v",
+        "Escape 3.0",
+        "Fiesta 1.6",
+        "Fiesta Titanium",
         "Fortaleza 5.4 2v",
         "Fortaleza 4.6 2v",
+        "Fusion 3.0",
+        "FX4 5.4 3v",
         "Super Duty F350 6.2",
-        "Super Duty F250 6.2"
+        "Super Duty F250 6.2",
+        "Triton F350 5.4 2v",
       ],
     },
   ];
