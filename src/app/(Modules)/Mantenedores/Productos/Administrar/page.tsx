@@ -119,11 +119,13 @@ export default function MantenedorProductoPage() {
       form.setValue("Codigo", Item.Codigo);
       form.setValue("Descripcion", Item.Descripcion);
       form.setValue("MarcaProd", Item.MarcaProd ?? "");
-      //form.setValue("Ubicacion", Item.Ubicacion ?? "");
+      form.setValue("Ubicacion", Item.Ubicacion ?? "");
       form.setValue("Existencia", Item.Existencia);
       form.setValue("Costo", Item.Costo);
       form.setValue("Precio", Item.Precio);
       form.setValue("Vigente", Item.Vigente!);
+      form.setValue("Minimo", Item.Minimo);
+      form.setValue("Maximo", Item.Maximo);
       setProducto(Item);
       setVehiculos(await GetVehiculosPorProducto(Item.Codigo));
     }
