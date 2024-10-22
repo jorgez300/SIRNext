@@ -22,6 +22,7 @@ import { FiltroProducto } from "@/domain/DTOs/Productos/FiltroProducto";
 import { Producto } from "@/domain/Models/Productos/Producto";
 import { GetProductosOperacion } from "@/domain/Services/ProductoService";
 import { useState } from "react";
+import { toast } from "sonner";
 
 type ModalProductosProps = {
   setOpen: (date: boolean) => void;
@@ -42,7 +43,9 @@ export default function ModalProductos(props: Readonly<ModalProductosProps>) {
       };
       setData(await GetProductosOperacion(filtro));
     } else {
-      alert("Minimo de 3 caracteres para busqueda");
+      toast("Error", {
+        description: "Minimo de 3 caracteres para busqueda",
+      });
     }
   };
 

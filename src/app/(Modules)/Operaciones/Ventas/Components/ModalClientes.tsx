@@ -22,6 +22,7 @@ import { FiltroCliente } from "@/domain/DTOs/Clientes/FiltroClientes";
 import { Cliente } from "@/domain/Models/Clientes/Cliente";
 import { GetClientesOperacion } from "@/domain/Services/ClienteService";
 import { useState } from "react";
+import { toast } from "sonner";
 
 type ModalClienteProps = {
   setOpen: (date: boolean) => void;
@@ -40,7 +41,9 @@ export default function ModalClientes(props: Readonly<ModalClienteProps>) {
       };
       setData(await GetClientesOperacion(filtro));
     } else {
-      alert("Minimo de 3 caracteres para busqueda");
+      toast("Error", {
+        description: "Minimo de 3 caracteres para busqueda",
+      });
     }
   };
 

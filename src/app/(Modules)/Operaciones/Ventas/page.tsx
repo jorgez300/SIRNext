@@ -59,8 +59,11 @@ export default function OperacionVentaPage() {
 
     if (mensaje.length > 0) {
       toast("Error", {
-        description: mensaje.join(", ")
+        description: mensaje.join(", "),
       });
+      return;
+    } else if (RegistrosInvalidos()) {
+      ConfirmaTotalizarVisible(false);
       return;
     } else {
       setUltimaOperacion(await InsertaOperacionVenta(data, cliente!));
@@ -68,6 +71,47 @@ export default function OperacionVentaPage() {
     }
 
     ConfirmaTotalizarVisible(false);
+  };
+
+  const RegistrosInvalidos = () => {
+    let lista = [];
+
+    lista = data.filter((itemVenta) => isNaN(itemVenta.Cantidad));
+
+    if (lista.length > 0) {
+      lista.forEach((itemVenta) => {
+        toast("Error", {
+          description: `Valide cantidad del producto: ${itemVenta.ProductoId}`,
+        });
+      });
+      return true;
+    }
+
+    lista = data.filter((itemVenta) => itemVenta.Cantidad <= 0);
+
+    if (lista.length > 0) {
+      lista.forEach((itemVenta) => {
+        toast("Error", {
+          description: `Valide cantidad del producto: ${itemVenta.ProductoId}`,
+        });
+      });
+      return true;
+    }
+
+    lista = data.filter(
+      (itemVenta) => itemVenta.Cantidad >= itemVenta.Existencia!
+    );
+
+    if (lista.length > 0) {
+      lista.forEach((itemVenta) => {
+        toast("Error", {
+          description: `No hay stock suficiente para el producto: ${itemVenta.ProductoId}`,
+        });
+      });
+      return true;
+    }
+
+    return false;
   };
 
   const Limpiar = () => {
@@ -105,16 +149,22 @@ export default function OperacionVentaPage() {
   const AgregarItemVenta = (item: Producto) => {
     const lista = [...data];
 
-    lista.push({
-      Posicion: 0,
-      ProductoId: item.Codigo,
-      ProductoDsc: item.Descripcion,
-      Cantidad: 1,
-      Existencia: item.Existencia,
-      Costo: item.Costo,
-      Precio: item.Precio,
-      Total: item.Precio,
-    });
+    if (!lista.find((x) => x.ProductoId === item.Codigo)) {
+      lista.push({
+        Posicion: 0,
+        ProductoId: item.Codigo,
+        ProductoDsc: item.Descripcion,
+        Cantidad: 1,
+        Existencia: item.Existencia,
+        Costo: item.Costo,
+        Precio: item.Precio,
+        Total: item.Precio,
+      });
+    } else {
+      toast("Error", {
+        description: "Producto ya ingresado",
+      });
+    }
 
     OrdenaPosicion(lista);
   };
@@ -186,16 +236,7 @@ export default function OperacionVentaPage() {
         <div>
           <div className="flex flex-row  gap-4 justify-end">
             <Button
-              className="bg-teal-600 ml-2"
-              onClick={() => {
-                ModalProductosVisible(true);
-              }}
-            >
-              <PlusIcon className="mr-2" />
-              Agregar Productos
-            </Button>
-            <Button
-              className="bg-teal-600 ml-2"
+              className="btnAzul ml-2"
               onClick={() => {
                 ModalClientesVisible(true);
               }}
@@ -204,7 +245,17 @@ export default function OperacionVentaPage() {
               Seleccionar Cliente
             </Button>
             <Button
-              className="bg-teal-600 ml-2"
+              className="btnAzul ml-2"
+              onClick={() => {
+                ModalProductosVisible(true);
+              }}
+            >
+              <PlusIcon className="mr-2" />
+              Agregar Productos
+            </Button>
+
+            <Button
+              className="btnTeal ml-2"
               onClick={() => {
                 ConfirmaTotalizarVisible(true);
               }}
@@ -213,8 +264,7 @@ export default function OperacionVentaPage() {
               Guardar
             </Button>
             <Button
-              variant="destructive"
-              className="ml-2"
+              className="btnRojo ml-2"
               onClick={() => {
                 Limpiar();
               }}
@@ -239,6 +289,9 @@ export default function OperacionVentaPage() {
               <TableHead className="w-[100px]">Acciones</TableHead>
               <TableHead className="w-[300px]">Codigo</TableHead>
               <TableHead>Descripcion</TableHead>
+              <TableHead className="w-[100px] text-center">
+                Existencia
+              </TableHead>
               <TableHead className="w-[100px] text-center">Cantidad</TableHead>
               <TableHead className="w-[100px] text-center">Precio</TableHead>
               <TableHead className="w-[100px] text-center">Total</TableHead>
@@ -246,7 +299,10 @@ export default function OperacionVentaPage() {
           </TableHeader>
           <TableBody>
             {data.map((itemVenta) => (
-              <TableRow className="even:bg-zinc-50 odd:bg-white" key={itemVenta.Posicion}>
+              <TableRow
+                className="even:bg-zinc-50 odd:bg-white"
+                key={itemVenta.Posicion}
+              >
                 <TableCell>
                   <Trash2Icon
                     className="text-teal-600"
@@ -257,6 +313,7 @@ export default function OperacionVentaPage() {
                 </TableCell>
                 <TableCell>{itemVenta.ProductoId}</TableCell>
                 <TableCell>{itemVenta.ProductoDsc}</TableCell>
+                <TableCell>{itemVenta.Existencia}</TableCell>
                 <TableCell>
                   <Input
                     maxLength={3}
@@ -289,7 +346,7 @@ export default function OperacionVentaPage() {
           </TableBody>
           <TableFooter>
             <TableRow>
-              <TableCell colSpan={3}>Total</TableCell>
+              <TableCell colSpan={4}>Total</TableCell>
               <TableCell className="text-center">
                 {GetTotalArticulos()}
               </TableCell>

@@ -2,7 +2,11 @@
 
 import { randomUUID } from "crypto";
 import { ExecQuery, GetCursor } from "../Clients/DatabaseClient";
-import { ActualizaExistenciaProducto } from "./ProductoService";
+import {
+  ActualizaCostoProducto,
+  ActualizaExistenciaProducto,
+  ActualizaPrecioProducto,
+} from "./ProductoService";
 import { RegistroCompra } from "../DTOs/Compras/RegistroCompra";
 import { Proveedor } from "../Models/Proveedores/Proveedor";
 import { Compra } from "../Models/Compras/Compra";
@@ -35,13 +39,12 @@ export const InsertaOperacionCompra = async (
       Posicion: item.Posicion,
       ProductoId: item.ProductoId,
       Cantidad: item.Cantidad,
-      Costo: item.Costo,
-      Precio: item.Precio,
+      Costo: Number(item.Costo),
+      Precio: Number(item.Precio),
       Total: item.Total,
     });
-
-    await ActualizaExistenciaProducto(item.ProductoId, item.Cantidad, "+");
   });
+  await ActualizaProducto(ItemCompra);
   return await RetornaIdCompra(Uid);
 };
 
@@ -94,8 +97,12 @@ export const RetornaListaCompras = async (
             INNER JOIN PUBLIC.proveedores P ON C.proveedorid = P.id
             WHERE
             (C.id = ${filtro.CompraId} OR '0' = '${filtro.CompraId}') AND
-            ((UPPER(P.identificacion) LIKE '%${filtro.ProveedorId}%' OR '' = '${filtro.ProveedorId}') OR
-            (UPPER(P.nombre) LIKE '%${filtro.ProveedorId}%' OR '' = '${filtro.ProveedorId}')) AND
+            ((UPPER(P.identificacion) LIKE '%${filtro.ProveedorId}%' OR '' = '${
+    filtro.ProveedorId
+  }') OR
+            (UPPER(P.nombre) LIKE '%${filtro.ProveedorId}%' OR '' = '${
+    filtro.ProveedorId
+  }')) AND
             (C.estado = '${filtro.Estado}' OR 'TODOS' = '${filtro.Estado}') AND
             C.FECHA BETWEEN to_timestamp('${FormatDate(
               filtro.FechaDesde!
@@ -171,7 +178,9 @@ export const GeneraDevolucion = async (
   registros: RegistroCompra[]
 ) => {
   await DevuelveCompra(item);
-  await ActualizaExistencia(registros);
+  registros.forEach(async (item) => {
+    await ActualizaExistenciaProducto(item.ProductoId, item.Cantidad, "-");
+  });
 };
 
 const DevuelveCompra = async (item: DetalleCompra) => {
@@ -182,8 +191,10 @@ const DevuelveCompra = async (item: DetalleCompra) => {
   await ExecQuery(query);
 };
 
-const ActualizaExistencia = async (registros: RegistroCompra[]) => {
+const ActualizaProducto = async (registros: RegistroCompra[]) => {
   registros.forEach(async (item) => {
     await ActualizaExistenciaProducto(item.ProductoId, item.Cantidad, "+");
+    await ActualizaCostoProducto(item.ProductoId, Number(item.Costo));
+    await ActualizaPrecioProducto(item.ProductoId, Number(item.Precio));
   });
 };

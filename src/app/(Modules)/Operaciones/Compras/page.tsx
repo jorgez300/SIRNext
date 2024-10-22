@@ -65,12 +65,71 @@ export default function OperacionCompraPage() {
         description: mensaje.join(", "),
       });
       return;
+    }
+
+    if (mensaje.length > 0) {
+      toast("Error", {
+        description: mensaje.join(", "),
+      });
+      ConfirmaTotalizarVisible(false);
+      return;
+    } else if (RegistrosInvalidos()) {
+      ConfirmaTotalizarVisible(false);
+      return;
     } else {
       setUltimaOperacion(await InsertaOperacionCompra(data, proveedor!));
       Limpiar();
     }
 
     ConfirmaTotalizarVisible(false);
+  };
+
+  const RegistrosInvalidos = () => {
+    let lista = [];
+
+    lista = data.filter(
+      (itemCompra) =>
+        isNaN(itemCompra.Cantidad) ||
+        isNaN(Number(itemCompra.Costo)) ||
+        isNaN(Number(itemCompra.Precio))
+    );
+
+    if (lista.length > 0) {
+      lista.forEach((itemCompra) => {
+        toast("Error", {
+          description: `Valide cantidad, costo y precio del producto: ${itemCompra.ProductoId}`,
+        });
+      });
+      return true;
+    }
+
+    lista = data.filter(
+      (itemCompra) =>
+        itemCompra.Cantidad <= 0 ||
+        Number(itemCompra.Costo) <= 0 ||
+        Number(itemCompra.Precio) <= 0
+    );
+
+    if (lista.length > 0) {
+      lista.forEach((itemCompra) => {
+        toast("Error", {
+          description: `Valide cantidad, costo y precio del producto: ${itemCompra.ProductoId}`,
+        });
+      });
+      return true;
+    }
+
+    lista = data.filter((itemCompra) => Number(itemCompra.Costo) >= Number(itemCompra.Precio));
+    if (lista.length > 0) {
+      lista.forEach((itemCompra) => {
+        toast("Error", {
+          description: `Costo mayor que el precio del producto: ${itemCompra.ProductoId}`,
+        });
+      });
+      return true;
+    }
+
+    return false;
   };
 
   const Limpiar = () => {
@@ -108,16 +167,22 @@ export default function OperacionCompraPage() {
   const AgregarItemCompra = (item: Producto) => {
     const lista = [...data];
 
-    lista.push({
-      Posicion: 0,
-      ProductoId: item.Codigo,
-      ProductoDsc: item.Descripcion,
-      Cantidad: 1,
-      Existencia: item.Existencia,
-      Costo: item.Costo,
-      Precio: item.Precio,
-      Total: item.Precio,
-    });
+    if (!lista.find((x) => x.ProductoId === item.Codigo)) {
+      lista.push({
+        Posicion: 0,
+        ProductoId: item.Codigo,
+        ProductoDsc: item.Descripcion,
+        Cantidad: 1,
+        Existencia: item.Existencia,
+        Costo: 0,
+        Precio: 0,
+        Total: 0,
+      });
+    } else {
+      toast("Error", {
+        description: "Producto ya ingresado",
+      });
+    }
 
     OrdenaPosicion(lista);
   };
@@ -153,14 +218,10 @@ export default function OperacionCompraPage() {
     return Total;
   };
 
-  const ActualizaItemCompra = (
+  const ActualizaCantidadItemCompra = (
     posicion: number,
-    cantidad: number,
-    existencia: number
+    cantidad: number
   ) => {
-    if (cantidad > existencia) {
-      cantidad = existencia;
-    }
 
     if (cantidad < 0) {
       cantidad = 1;
@@ -170,7 +231,31 @@ export default function OperacionCompraPage() {
     const nlista: RegistroCompra[] = lista.filter((item) => item.Posicion >= 0);
     nlista[posicion].Cantidad = cantidad;
     nlista[posicion].Total =
-      nlista[posicion].Precio * nlista[posicion].Cantidad;
+      Number(nlista[posicion].Costo) * nlista[posicion].Cantidad;
+
+    OrdenaPosicion(nlista);
+  };
+
+  const ActualizaCostoItemCompra = (
+    posicion: number,
+    costo: number | string
+  ) => {
+    const lista = data;
+    const nlista: RegistroCompra[] = lista.filter((item) => item.Posicion >= 0);
+    nlista[posicion].Costo = costo;
+    nlista[posicion].Total =
+      Number(nlista[posicion].Costo) * nlista[posicion].Cantidad;
+
+    OrdenaPosicion(nlista);
+  };
+
+  const ActualizaPrecioItemCompra = (
+    posicion: number,
+    precio: number | string
+  ) => {
+    const lista = data;
+    const nlista: RegistroCompra[] = lista.filter((item) => item.Posicion >= 0);
+    nlista[posicion].Precio = precio;
 
     OrdenaPosicion(nlista);
   };
@@ -191,16 +276,7 @@ export default function OperacionCompraPage() {
         <div>
           <div className="flex flex-row  gap-4 justify-end">
             <Button
-              className="bg-teal-600 ml-2"
-              onClick={() => {
-                ModalProductosVisible(true);
-              }}
-            >
-              <PlusIcon className="mr-2" />
-              Agregar Productos
-            </Button>
-            <Button
-              className="bg-teal-600 ml-2"
+              className="btnAzul ml-2"
               onClick={() => {
                 ModalProveedorVisible(true);
               }}
@@ -208,8 +284,19 @@ export default function OperacionCompraPage() {
               <PlusIcon className="mr-2" />
               Seleccionar Proveedor
             </Button>
+
             <Button
-              className="bg-teal-600 ml-2"
+              className="btnAzul ml-2"
+              onClick={() => {
+                ModalProductosVisible(true);
+              }}
+            >
+              <PlusIcon className="mr-2" />
+              Agregar Productos
+            </Button>
+
+            <Button
+              className="btnTeal ml-2"
               onClick={() => {
                 ConfirmaTotalizarVisible(true);
               }}
@@ -218,8 +305,7 @@ export default function OperacionCompraPage() {
               Guardar
             </Button>
             <Button
-              variant="destructive"
-              className="ml-2"
+              className="btnRojo ml-2"
               onClick={() => {
                 Limpiar();
               }}
@@ -244,9 +330,15 @@ export default function OperacionCompraPage() {
               <TableHead className="w-[100px]">Acciones</TableHead>
               <TableHead className="w-[300px]">Codigo</TableHead>
               <TableHead>Descripcion</TableHead>
+              <TableHead className="w-[100px] text-center">
+                Existencia
+              </TableHead>
               <TableHead className="w-[100px] text-center">Cantidad</TableHead>
-              <TableHead className="w-[100px] text-center">Precio</TableHead>
-              <TableHead className="w-[100px] text-center">Total</TableHead>
+              <TableHead className="w-[200px] text-center">Costo</TableHead>
+              <TableHead className="w-[200px] text-center">Precio</TableHead>
+              <TableHead className="w-[100px] text-center">
+                Costo Total
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -265,31 +357,62 @@ export default function OperacionCompraPage() {
                 </TableCell>
                 <TableCell>{itemCompra.ProductoId}</TableCell>
                 <TableCell>{itemCompra.ProductoDsc}</TableCell>
+                <TableCell>{itemCompra.Existencia}</TableCell>
                 <TableCell>
                   <Input
                     maxLength={3}
                     type="number"
                     className="w-full"
                     max={itemCompra.Existencia}
-                    value={itemCompra.Cantidad}
+                    value={Number(itemCompra.Cantidad)}
                     onChange={(e) => {
-                      ActualizaItemCompra(
+                      ActualizaCantidadItemCompra(
                         itemCompra.Posicion,
-                        Number(e.target.value),
-                        Number(itemCompra.Existencia)
+                        Number(e.target.value)
                       );
                     }}
-                    onBlur={(e) => {
-                      ActualizaItemCompra(
-                        itemCompra.Posicion,
-                        Number(e.target.value),
-                        Number(itemCompra.Existencia)
+
+                  ></Input>
+                </TableCell>
+                <TableCell>
+                  <Input
+                    maxLength={10}
+                    type="text"
+                    className="w-full"
+                    lang="en"
+                    value={itemCompra.Costo == 0 ? "" : itemCompra.Costo}
+                    onChange={(e) => {
+                      console.log(
+                        "isNaN",
+                        e.target.value,
+                        isNaN(Number(e.target.value))
                       );
+
+                      if (!isNaN(Number(e.target.value))) {
+                        ActualizaCostoItemCompra(
+                          itemCompra.Posicion,
+                          e.target.value
+                        );
+                      }
                     }}
                   ></Input>
                 </TableCell>
-                <TableCell className="text-center">
-                  {itemCompra.Precio}
+                <TableCell>
+                  <Input
+                    maxLength={10}
+                    type="text"
+                    className="w-full"
+                    lang="en"
+                    value={itemCompra.Precio == 0 ? "" : itemCompra.Precio}
+                    onChange={(e) => {
+                      if (!isNaN(Number(e.target.value))) {
+                        ActualizaPrecioItemCompra(
+                          itemCompra.Posicion,
+                          e.target.value
+                        );
+                      }
+                    }}
+                  ></Input>
                 </TableCell>
                 <TableCell className="text-center">
                   {itemCompra.Total}
@@ -299,11 +422,11 @@ export default function OperacionCompraPage() {
           </TableBody>
           <TableFooter>
             <TableRow>
-              <TableCell colSpan={3}>Total</TableCell>
+              <TableCell colSpan={4}>Total</TableCell>
               <TableCell className="text-center">
                 {GetTotalArticulos()}
               </TableCell>
-              <TableCell></TableCell>
+              <TableCell colSpan={2}></TableCell>
               <TableCell className="text-center">{GetTotalCompra()}</TableCell>
             </TableRow>
           </TableFooter>

@@ -5,6 +5,6 @@ export type RegistroVenta = {
   Cantidad: number;
   Existencia?: number;
   Costo: number;
-  Precio: number;
+  Precio:  number;
   Total: number;
 };
