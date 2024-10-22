@@ -382,12 +382,6 @@ export default function OperacionCompraPage() {
                     lang="en"
                     value={itemCompra.Costo == 0 ? "" : itemCompra.Costo}
                     onChange={(e) => {
-                      console.log(
-                        "isNaN",
-                        e.target.value,
-                        isNaN(Number(e.target.value))
-                      );
-
                       if (!isNaN(Number(e.target.value))) {
                         ActualizaCostoItemCompra(
                           itemCompra.Posicion,
