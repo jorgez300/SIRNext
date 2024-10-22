@@ -113,6 +113,8 @@ export const GetProductoById = async (
     MarcaProd: data[0].marcaprod,
     Ubicacion: data[0].ubicacion,
     Existencia: data[0].existencia,
+    Minimo: data[0].minimo,
+    Maximo: data[0].maximo,
     Vigente: data[0].vigente,
     Costo: data[0].costo,
     Precio: data[0].precio,
@@ -171,6 +173,30 @@ export const ActualizaExistenciaProducto = async (
   const query = `UPDATE public.productos
             SET 
               existencia= existencia ${Operacion} ${Cantidad}
+            WHERE codigo = UPPER('${ProductoId}')`;
+
+  await ExecQuery(query);
+};
+
+export const ActualizaCostoProducto = async (
+  ProductoId: string,
+  Costo: number
+) => {
+  const query = `UPDATE public.productos
+            SET 
+              costo = ${Costo}
+            WHERE codigo = UPPER('${ProductoId}')`;
+
+  await ExecQuery(query);
+};
+
+export const ActualizaPrecioProducto = async (
+  ProductoId: string,
+  Precio: number
+) => {
+  const query = `UPDATE public.productos
+            SET 
+              precio = ${Precio}
             WHERE codigo = UPPER('${ProductoId}')`;
 
   await ExecQuery(query);

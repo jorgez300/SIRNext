@@ -24,6 +24,7 @@ import { Proveedor } from "@/domain/Models/Proveedores/Proveedor";
 
 import { GetProveedoresOperacion } from "@/domain/Services/ProveedorService";
 import { useState } from "react";
+import { toast } from "sonner";
 
 type ModalProveedorProps = {
   setOpen: (date: boolean) => void;
@@ -42,7 +43,9 @@ export default function ModalProveedor(props: Readonly<ModalProveedorProps>) {
       };
       setData(await GetProveedoresOperacion(filtro));
     } else {
-      alert("Minimo de 3 caracteres para busqueda");
+      toast("Error", {
+        description: "Minimo de 3 caracteres para busqueda",
+      });
     }
   };
 

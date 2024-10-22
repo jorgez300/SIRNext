@@ -19,12 +19,14 @@ export const GetModelosPorMarca = async () => {
     {
       Marca: "Ford",
       Modelos: [
+        "Ecosport 2.0",
         "Ecosport Titanium",
         "Explorer Eddi Bauer 4.6 3v",
         "Explorer Limited 3.5",
         "Escape 3.0",
         "Fiesta 1.6",
         "Fiesta Titanium",
+        "Focus 2.0",
         "Fortaleza 5.4 2v",
         "Fortaleza 4.6 2v",
         "Fusion 3.0",

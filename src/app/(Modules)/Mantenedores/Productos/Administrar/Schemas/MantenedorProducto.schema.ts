@@ -19,7 +19,18 @@ export const MantenedorProductoSchema = z.object({
   Ubicacion: z.string({ required_error: "Requerido" }),
   Existencia: z.coerce
     .number({ message: "Numero invalido" })
+    .int()
     .nonnegative({ message: "Numero invalido" }),
+  Minimo: z.coerce
+    .number({ message: "Numero invalido" })
+    .int()
+    .nonnegative({ message: "Numero invalido" })
+    .optional(),
+  Maximo: z.coerce
+    .number({ message: "Numero invalido" })
+    .int()
+    .nonnegative({ message: "Numero invalido" })
+    .optional(),
   Costo: z.coerce
     .number({ message: "Numero invalido" })
     .positive({ message: "Numero invalido" }),

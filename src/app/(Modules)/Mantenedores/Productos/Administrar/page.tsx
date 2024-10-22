@@ -103,6 +103,8 @@ export default function MantenedorProductoPage() {
         form.setValue("Costo", Item.Costo);
         form.setValue("Precio", Item.Precio);
         form.setValue("Vigente", Item.Vigente!);
+        form.setValue("Minimo", Item.Minimo);
+        form.setValue("Maximo", Item.Maximo);
       }
       setProducto(Item);
       setVehiculos(await GetVehiculosPorProducto(Codigo));
@@ -184,6 +186,8 @@ export default function MantenedorProductoPage() {
         Ubicacion: form.getValues("Ubicacion"),
         Vigente: form.getValues("Vigente"),
         Existencia: form.getValues("Existencia"),
+        Minimo: form.getValues("Minimo"),
+        Maximo: form.getValues("Maximo"),
         Costo: form.getValues("Costo"),
         Precio: form.getValues("Precio"),
       };
@@ -295,12 +299,12 @@ export default function MantenedorProductoPage() {
   return (
     <main className="grid grid-cols-1 gap-3 p-4">
       <Form {...form}>
-        <form className="grid grid-cols-4 gap-2">
+        <form className="grid grid-cols-6 gap-2">
           <FormField
             control={form.control}
             name="Codigo"
             render={({ field }) => (
-              <FormItem className="col-span-3 ">
+              <FormItem className="col-span-5 ">
                 <FormLabel>Codigo</FormLabel>
                 <FormControl>
                   <Input
@@ -333,7 +337,7 @@ export default function MantenedorProductoPage() {
             control={form.control}
             name="Descripcion"
             render={({ field }) => (
-              <FormItem className="col-span-4">
+              <FormItem className="col-span-6">
                 <FormLabel>Descripcion</FormLabel>
                 <FormControl>
                   <Textarea placeholder="Descripcion" {...field} />
@@ -346,7 +350,7 @@ export default function MantenedorProductoPage() {
             control={form.control}
             name="MarcaProd"
             render={({ field }) => (
-              <FormItem className="col-span-2">
+              <FormItem className="col-span-4">
                 <FormLabel>Marca Producto</FormLabel>
                 <FormControl>
                   <Input placeholder="Marca Producto" {...field} />
@@ -361,10 +365,7 @@ export default function MantenedorProductoPage() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Ubicacion</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value}
-                >
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccione ubicacion" />
@@ -379,12 +380,11 @@ export default function MantenedorProductoPage() {
             control={form.control}
             name="Vigente"
             render={({ field }) => (
-              <FormItem className="col-span-4 flex flex-row">
-                <div className="">
-                  <FormLabel className="mr-4">Vigente</FormLabel>
-                </div>
+              <FormItem className="flex flex-col px-4">
+                <FormLabel className="mr-4 mb-5">Vigente</FormLabel>
                 <FormControl>
                   <Checkbox
+                    className="mt-1"
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />
@@ -400,6 +400,33 @@ export default function MantenedorProductoPage() {
                 <FormLabel>Existencia</FormLabel>
                 <FormControl>
                   <Input placeholder="Existencia" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="Minimo"
+            render={({ field }) => (
+              <FormItem className=" ">
+                <FormLabel>Minimo</FormLabel>
+                <FormControl>
+                  <Input placeholder="Minimo" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="Maximo"
+            render={({ field }) => (
+              <FormItem className=" ">
+                <FormLabel>Maximo</FormLabel>
+                <FormControl>
+                  <Input placeholder="Maximo" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

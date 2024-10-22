@@ -89,3 +89,28 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+.btnRojo {
+  background-color: #ef4444 !important;
+}
+
+.btnRojo:hover {
+  background-color: #dc2626 !important;
+}
+
+.btnAzul {
+  background-color: #06b6d4 !important;
+}
+
+.btnAzul:hover {
+  background-color: #0891b2 !important;
+}
+
+.btnTeal {
+  background-color: #14b8a6 !important;
+}
+
+.btnTeal:hover {
+  background-color: #0d9488 !important;
+}

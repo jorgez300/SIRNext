@@ -4,7 +4,7 @@ export type RegistroCompra = {
     ProductoDsc: string;
     Cantidad: number;
     Existencia?: number;
-    Costo: number;
-    Precio: number;
+    Costo: number | string;
+    Precio: number | string;
     Total: number;
   };
