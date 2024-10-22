@@ -133,9 +133,11 @@ export const ActualizaProducto = async (Producto: ProductoCompleto) => {
               existencia=${Producto.Item!.Existencia}, 
               costo=${Producto.Item!.Costo}, 
               precio=${Producto.Item!.Precio}, 
-              minimo=${Producto.Item!.Minimo ?? "NULL"}, 
-              maximo=${Producto.Item!.Maximo ?? "NULL"}
+              minimo=${Producto.Item!.Minimo ? Producto.Item!.Minimo : "NULL"}, 
+              maximo=${Producto.Item!.Maximo ? Producto.Item!.Maximo : "NULL"}
             WHERE codigo = UPPER('${Producto.Item!.Codigo ?? ""}')`;
+
+  console.log("query", query);
 
   await ExecQuery(query);
 
@@ -155,8 +157,8 @@ export const InsertaProducto = async (Producto: ProductoCompleto) => {
                     ${Producto.Item!.Existencia}, 
                     ${Producto.Item!.Costo}, 
                     ${Producto.Item!.Precio}, 
-                    ${Producto.Item!.Minimo ?? "NULL"}, 
-                    ${Producto.Item!.Maximo ?? "NULL"}
+                    ${Producto.Item!.Minimo ? Producto.Item!.Minimo : "NULL"}, 
+                    ${Producto.Item!.Maximo ? Producto.Item!.Maximo : "NULL"}
                   )`;
 
   await ExecQuery(query);
@@ -167,7 +169,7 @@ export const InsertaProducto = async (Producto: ProductoCompleto) => {
 export const ActualizaExistenciaProducto = async (
   ProductoId: string,
   Cantidad: number,
-  Operacion: '-' | '+'
+  Operacion: "-" | "+"
 ) => {
   if (Cantidad == 0) return;
   const query = `UPDATE public.productos
