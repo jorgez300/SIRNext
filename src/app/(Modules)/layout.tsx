@@ -10,7 +10,7 @@ import {
   PackageSearch,
   Truck,
   ChartColumn,
-  Hotel
+  Hotel,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -71,6 +71,13 @@ export default function RootLayout({
                   >
                     <PackageSearch className="h-5 w-5" />
                     Lista Productos
+                  </Link>
+                  <Link
+                    href="/Reportes/Productos"
+                    className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                  >
+                    <PackageSearch className="h-5 w-5" />
+                    Reporte Productos
                   </Link>
                   <Link
                     href="/Operaciones/Ventas"

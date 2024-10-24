@@ -2,6 +2,7 @@
 
 import { ExecQuery, GetCursor } from "../Clients/DatabaseClient";
 import { FiltroProducto } from "../DTOs/Productos/FiltroProducto";
+import { FiltroReporteProducto } from "../DTOs/Productos/FiltroReporteProducto";
 import { ProductoCompleto } from "../DTOs/Productos/ProductoCompleto";
 import { Producto } from "../Models/Productos/Producto";
 import {
@@ -137,8 +138,6 @@ export const ActualizaProducto = async (Producto: ProductoCompleto) => {
               maximo=${Producto.Item!.Maximo ? Producto.Item!.Maximo : "NULL"}
             WHERE codigo = UPPER('${Producto.Item!.Codigo ?? ""}')`;
 
-  console.log("query", query);
-
   await ExecQuery(query);
 
   await InsertaVehiculosPorProducto(Producto.Item!.Codigo, Producto.Vehiculos!);
@@ -202,4 +201,62 @@ export const ActualizaPrecioProducto = async (
             WHERE codigo = UPPER('${ProductoId}')`;
 
   await ExecQuery(query);
+};
+
+export const GetReporteProductos = async (
+  filtro?: FiltroReporteProducto
+): Promise<Producto[]> => {
+  let Tipo = "";
+  console.log('filtro', filtro)
+
+  if (filtro?.TipoReporte == "Exis<=0") {
+    Tipo = "and existencia <= 0";
+  }
+
+  if (filtro?.TipoReporte == "Exis<=Min") {
+    Tipo = "and existencia <= minimo";
+  }
+
+  if (filtro?.TipoReporte == "Exis>=Max") {
+    Tipo = "and existencia >= maximo";
+  }
+
+  const query = `SELECT 
+      codigo, 
+      descripcion, 
+      marcaprod, 
+      vigente, 
+      existencia, 
+      costo, 
+      precio, 
+      minimo, 
+      maximo, 
+      ubicacion
+    FROM public.productos
+    WHERE
+    vigente = true and
+    (ubicacion = '${filtro?.Ubicacion}' or 'TODOS' = '${filtro?.Ubicacion}') 
+    ${Tipo}
+    order by descripcion asc
+`;
+
+console.log('query', query)
+
+  const lista: Producto[] = [];
+  const data = await GetCursor(query);
+  data.forEach((item) => {
+    lista.push({
+      Codigo: item.codigo,
+      Descripcion: item.descripcion,
+      MarcaProd: item.marcaprod,
+      Ubicacion: item.ubicacion,
+      Existencia: item.existencia,
+      Minimo: item.minimo,
+      Maximo: item.maximo,
+      Vigente: item.vigente,
+      Costo: item.costo,
+      Precio: item.precio,
+    });
+  });
+  return lista;
 };
