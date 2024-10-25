@@ -12,7 +12,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { SearchCheckIcon } from "lucide-react";
+import { SearchCheckIcon, Sheet } from "lucide-react";
 
 import {
   Select,
@@ -24,8 +24,10 @@ import {
 import { FiltroReporteProducto } from "@/domain/DTOs/Productos/FiltroReporteProducto";
 import { FiltroReporteProductoSchema } from "../Schemas/FiltroReporteProducto.schema";
 
+
 type FiltroReporteProductoProps = {
   Buscar: (filtros: FiltroReporteProducto) => Promise<void>;
+  Exportar: () => Promise<void>;
 };
 
 export default function FiltroReporteProductos(
@@ -48,11 +50,16 @@ export default function FiltroReporteProductos(
           TipoReporte: form.getValues("TipoReporte"),
           Ubicacion: form.getValues("Ubicacion"),
         };
-        console.log('FiltroReporteProducto', NewItem)
+        console.log("FiltroReporteProducto", NewItem);
         await props.Buscar(NewItem);
       }
     });
   };
+
+  const handleExportar = async () => {
+    await props.Exportar();
+  };
+
 
   const GeneraUbicacion = () => {
     const cont = [];
@@ -136,6 +143,10 @@ export default function FiltroReporteProductos(
           <Button className="mr-2" onClick={handleSubmit}>
             <SearchCheckIcon className="mr-2" />
             Consultar
+          </Button>
+          <Button className="mr-2 hidden" onClick={handleExportar}>
+            <Sheet className="mr-2" />
+            Exportar
           </Button>
         </div>
       </div>

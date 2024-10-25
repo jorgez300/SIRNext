@@ -11,6 +11,8 @@ import { useCodPantallaStore } from "@/app/global/Store/CodPantalla.store";
 import { TablaReporteProducto } from "./Components/Tabla";
 import FiltroReporteProductos from "./Components/Filtros";
 import { FiltroReporteProducto } from "@/domain/DTOs/Productos/FiltroReporteProducto";
+import { Toaster } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 export default function ReporteProductoProductoPage() {
   const [listaProducto, setListaProducto] = useState<Producto[]>([]);
@@ -27,6 +29,17 @@ export default function ReporteProductoProductoPage() {
 
   const Buscar = async (filtro?: FiltroReporteProducto) => {
     setListaProducto(await GetReporteProductos(filtro));
+  };
+
+  const Exportar = async () => {
+    if (listaProducto.length == 0) {
+      toast("Error", {
+        description: "Listado vacio",
+      });
+      return;
+    }
+    //const file = await GeneraExcelReporteProductos(listaProducto);
+    //window.open(`/Temp/${file}`, '_blank');
   };
 
   const columns: ColumnDef<Producto>[] = [
@@ -95,11 +108,12 @@ export default function ReporteProductoProductoPage() {
     <Suspense>
       <main className="grid grid-cols-1 gap-3 p-4">
         <div>
-          <FiltroReporteProductos Buscar={Buscar} />
+          <FiltroReporteProductos Buscar={Buscar} Exportar={Exportar} />
         </div>
         <div className="w-full">
           <TablaReporteProducto columns={columns} data={listaProducto} />
         </div>
+        <Toaster />
       </main>
     </Suspense>
   );

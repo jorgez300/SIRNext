@@ -11,6 +11,7 @@ import {
   Truck,
   ChartColumn,
   Hotel,
+  FileBox
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -76,7 +77,7 @@ export default function RootLayout({
                     href="/Reportes/Productos"
                     className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                   >
-                    <PackageSearch className="h-5 w-5" />
+                    <FileBox className="h-5 w-5" />
                     Reporte Productos
                   </Link>
                   <Link
