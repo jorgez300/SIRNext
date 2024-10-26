@@ -13,6 +13,7 @@ import { Compra } from "../Models/Compras/Compra";
 import { ItemCompra } from "../Models/Compras/ItemCompra";
 import { FiltroCompra } from "../DTOs/Compras/FiltroCompra";
 import { DetalleCompra } from "../DTOs/Compras/DetalleCompra";
+import { DatoGraficoUnaSerie } from "../DTOs/DatoGraficoUnaSerie.dto";
 
 export const InsertaOperacionCompra = async (
   ItemCompra: RegistroCompra[],
@@ -197,4 +198,35 @@ const ActualizaProducto = async (registros: RegistroCompra[]) => {
     await ActualizaCostoProducto(item.ProductoId, Number(item.Costo));
     await ActualizaPrecioProducto(item.ProductoId, Number(item.Precio));
   });
+};
+
+export const GetComprasPorDia = async (periodo: string) => {
+  const query = `select fecha,  sum (totalcompra) total
+                  from 
+                  (
+                    select 
+                    TO_CHAR(fecha, 'YYYY-MM-DD') as fecha, 
+                    totalcompra
+                    from public.compras
+                    where 
+                    EXTRACT(MONTH FROM fecha) = ${periodo.split("-")[1]}  and
+                    EXTRACT(YEAR FROM fecha) = ${periodo.split("-")[0]} and
+                    ESTADO = 'VIGENTE'
+                  )
+                  group by fecha
+                  order by fecha asc`;
+
+  const data = await GetCursor(query);
+
+  if (data.length == 0) {
+    return [];
+  }
+  const ChartData: DatoGraficoUnaSerie[] = data.map((item) => {
+    return {
+      Fecha: item.fecha.split('-')[2],
+      ValorA: item.total,
+    };
+  });
+
+  return ChartData;
 };

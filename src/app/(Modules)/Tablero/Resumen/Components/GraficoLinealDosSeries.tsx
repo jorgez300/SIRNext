@@ -16,10 +16,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { DatoGraficoUnaSerie } from "@/domain/DTOs/DatoGraficoUnaSerie.dto";
-
-
-
+import { DatoGraficoDosSeries } from "@/domain/DTOs/DatoGraficoDosSeries.dto";
 
 type GraficoLinealProps = {
   Title: string;
@@ -27,18 +24,21 @@ type GraficoLinealProps = {
   Info?: string;
   Period?: string;
   TituloSerieA: string;
-  chartData: DatoGraficoUnaSerie[];
+  TituloSerieB: string;
+  chartData: DatoGraficoDosSeries[];
 };
 
-export function GraficoLineal(props: Readonly<GraficoLinealProps>) {
-
+export function GraficoLinealDosSeries(props: Readonly<GraficoLinealProps>) {
   const chartConfig = {
     ValorA: {
       label: props.TituloSerieA,
       color: "hsl(var(--chart-2))",
-    }
+    },
+    ValorB: {
+      label: props.TituloSerieB,
+      color: "hsl(var(--chart-3))",
+    },
   } satisfies ChartConfig;
-
 
   return (
     <Card>
@@ -76,6 +76,14 @@ export function GraficoLineal(props: Readonly<GraficoLinealProps>) {
               stroke="var(--color-ValorA)"
               stackId="a"
             />
+            <Area
+              dataKey="ValorB"
+              type="natural"
+              fill="var(--color-ValorB)"
+              fillOpacity={0.4}
+              stroke="var(--color-ValorB)"
+              stackId="a"
+            />
             <ChartLegend content={<ChartLegendContent />} />
           </AreaChart>
         </ChartContainer>
@@ -87,7 +95,7 @@ export function GraficoLineal(props: Readonly<GraficoLinealProps>) {
               {props.Info ?? ""}
             </div>
             <div className="flex items-center gap-2 leading-none text-muted-foreground">
-            {props.Period ?? ""}
+              {props.Period ?? ""}
             </div>
           </div>
         </div>

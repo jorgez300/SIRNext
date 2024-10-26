@@ -35,7 +35,7 @@ import {
 import { useAdministraClienteStore } from "../Store/AdmistraCliente.store";
 
 type MantenedorClienteProps = {
-  setOpen: (date: boolean) => void;
+  setOpen: (flag: boolean) => void;
 };
 
 export default function MantenedorCliente(
@@ -97,7 +97,7 @@ export default function MantenedorCliente(
   }
 
   return (
-    <Dialog defaultOpen={true}>
+    <Dialog defaultOpen={true} onOpenChange={props.setOpen}>
       <DialogContent
         onInteractOutside={(e) => {
           e.preventDefault();

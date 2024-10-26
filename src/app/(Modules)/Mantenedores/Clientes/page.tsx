@@ -19,7 +19,7 @@ export default function ClientesPage() {
   const [open, setOpen] = useState(false);
   const [listaClientes, setListaClientes] = useState<Cliente[]>([]);
 
-  const { RegistraCliente } = useAdministraClienteStore();
+  const { RegistraCliente, ResetCliente } = useAdministraClienteStore();
 
   const { RegistraCodPantalla } = useCodPantallaStore();
 
@@ -30,6 +30,7 @@ export default function ClientesPage() {
       Titulo: "Administrar Clientes",
     });
     Buscar();
+    ResetCliente();
   }, []);
 
   const Buscar = async (filtro?: FiltroCliente) => {

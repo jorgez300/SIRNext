@@ -346,3 +346,31 @@ export const GeneraExcelReporteProductos = async (items: Producto[]) => {
   return Filename;
 };
 */
+
+
+export const GetCostoTotalInventario = async () =>{
+
+  const query = `SELECT SUM(EXISTENCIA * COSTO) TOTAL FROM PUBLIC.PRODUCTOS`;
+
+  const data = await GetCursor(query);
+
+  if (data.length == 0) {
+    return 0;
+  }
+  return (data[0].total) ? data[0].total : 0;
+
+}
+
+
+export const GetItemsTotalInventario = async () =>{
+
+  const query = `SELECT SUM(EXISTENCIA) TOTAL FROM PUBLIC.PRODUCTOS`;
+
+  const data = await GetCursor(query);
+
+  if (data.length == 0) {
+    return 0;
+  }
+  return (data[0].total) ? data[0].total : 0;
+
+}
