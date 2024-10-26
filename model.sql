@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS public.itemventas
 DROP TABLE IF EXISTS public.productos;
 CREATE TABLE IF NOT EXISTS public.productos
 (
-    codigo VARCHAR(255) NOT NULL,
+    codigo VARCHAR(255) PRIMARY KEY,
     descripcion VARCHAR(255) NOT NULL,
     marcaprod VARCHAR(255) NOT NULL,
     vigente boolean NOT NULL,
@@ -87,5 +87,15 @@ CREATE TABLE IF NOT EXISTS public.ventas
     totalarticulos integer NOT NULL,
     totalventa numeric(10,2) NOT NULL,
     estado VARCHAR(255) NOT NULL DEFAULT 'VIGENTE'::character varying
+);
+
+DROP TABLE IF EXISTS public.costo;
+CREATE TABLE public.costo (
+    Id VARCHAR(50) PRIMARY KEY, 
+    Codigo VARCHAR(50) NOT NULL,
+    Descripcion VARCHAR(255) NOT NULL,
+    Costo DECIMAL(10, 2) NOT NULL,
+    Tipo VARCHAR(50) NOT NULL,
+    Fecha timestamp without time zone NOT NULL
 );
 

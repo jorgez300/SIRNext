@@ -24,63 +24,103 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import { z } from "zod";
-import { GuardaCosto } from "@/domain/Services/CostoService";
+import {
+  ActualizaCosto,
+  GetCostoById,
+  InsertaCosto,
+} from "@/domain/Services/CostoService";
 import { Costo } from "@/domain/Models/Costos/Costo";
-import { MantenedorCostoSchema, MantenedorCostoDefault } from "../Schemas/MantenedorCosto.schema";
-
+import { MantenedorCostoSchema } from "../Schemas/MantenedorCosto.schema";
+import { useAdministraCostoStore } from "../Store/AdministraCosto.store";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type MantenedorCostoProps = {
-  date: Date | undefined;
-  setDate: (date: Date | undefined) => void;
-  open: boolean;
-  setOpen: (date: boolean) => void;
-  costo?: Costo;
+  setOpen: (flag: boolean) => void;
 };
 
-export default function MantenedorCosto(
-  props: Readonly<MantenedorCostoProps>
-) {
+export default function MantenedorCosto(props: Readonly<MantenedorCostoProps>) {
+  const { Costo, RegistraCosto, ResetCosto } = useAdministraCostoStore();
+
+  let MantenedorCostoDefault = {
+    Codigo: "",
+    Descripcion: "",
+    Costo: 0,
+    Tipo: "U",
+  };
+
+  if (Costo) {
+    MantenedorCostoDefault = {
+      Codigo: Costo.Codigo,
+      Descripcion: Costo.Descripcion,
+      Costo: Costo.Costo,
+      Tipo: Costo.Tipo,
+    };
+  }
+
   const form = useForm<z.infer<typeof MantenedorCostoSchema>>({
     resolver: zodResolver(MantenedorCostoSchema),
     defaultValues: MantenedorCostoDefault,
   });
 
-  if (props.costo) {
-    form.setValue("Codigo", props.costo.Codigo);
-    form.setValue("Descripcion", props.costo.Descripcion);
-    form.setValue("Costo", props.costo.Costo);
-
-  }
-
-  function handleClose() {
+  const handleClose = async () => {
     form.reset();
+    await ResetCosto();
     props.setOpen(false);
-  }
+  };
+
+  const ValidaExiste = async (id: string) => {
+    const data = await GetCostoById(id);
+
+    if (data) {
+      await RegistraCosto(data);
+      form.setValue("Codigo", data.Codigo);
+      form.setValue("Descripcion", data.Descripcion);
+      form.setValue("Costo", data.Costo);
+      form.setValue("Tipo", data.Tipo);
+    }
+  };
 
   function handleSubmit() {
-    form.trigger();
-    if (form.formState.isValid) {
-      const NewItem: Costo = {
-        Id: props.costo ? props.costo.Id : undefined,
-        Codigo: form.getValues("Codigo"),
-        Descripcion: form.getValues("Descripcion"),
-        Costo: form.getValues("Costo")
-      };
-      GuardaCosto(NewItem);
-      handleClose();
-    }
+    form.trigger().then(() => {
+      if (form.formState.isValid) {
+        const NewItem: Costo = {
+          Id: Costo ? Costo.Id : undefined,
+          Codigo: form.getValues("Codigo"),
+          Descripcion: form.getValues("Descripcion"),
+          Costo: form.getValues("Costo"),
+          Tipo: form.getValues("Tipo"),
+        };
+        if (Costo) {
+          ActualizaCosto(NewItem);
+        } else {
+          InsertaCosto(NewItem);
+        }
+
+        handleClose();
+      }
+    });
+
   }
 
   return (
-    <Dialog open={props.open} onOpenChange={props.setOpen}>
+    <Dialog defaultOpen={true} onOpenChange={props.setOpen}>
       <DialogContent
-        onPointerDownOutside={(e) => {
+        onInteractOutside={(e) => {
+          e.preventDefault();
+        }}
+        onEscapeKeyDown={(e) => {
           e.preventDefault();
         }}
         className="w-full max-w-6xl"
       >
         <DialogHeader>
-          <DialogTitle>{props.costo ? "Editar" : "Nuevo"}</DialogTitle>
+          <DialogTitle>{Costo ? "Editar" : "Nuevo"}</DialogTitle>
           <DialogDescription>Version</DialogDescription>
         </DialogHeader>
 
@@ -99,7 +139,14 @@ export default function MantenedorCosto(
                   <FormItem className="col-span-4 ">
                     <FormLabel>Codigo</FormLabel>
                     <FormControl>
-                      <Input placeholder="Codigo" {...field} />
+                      <Input
+                        placeholder="Codigo"
+                        {...field}
+                        disabled={Costo ? true : false}
+                        onBlur={async (e) => {
+                          await ValidaExiste(e.target.value.toUpperCase());
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -128,6 +175,26 @@ export default function MantenedorCosto(
                       <Input placeholder="Costo" {...field} />
                     </FormControl>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="Tipo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Repeticion</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccione Tipo" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="R">Recurrente</SelectItem>
+                        <SelectItem value="U">Unico</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </FormItem>
                 )}
               />

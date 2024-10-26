@@ -2,12 +2,14 @@
 
 import { ExecQuery, GetCursor } from "../Clients/DatabaseClient";
 import { FiltroProducto } from "../DTOs/Productos/FiltroProducto";
+import { FiltroReporteProducto } from "../DTOs/Productos/FiltroReporteProducto";
 import { ProductoCompleto } from "../DTOs/Productos/ProductoCompleto";
 import { Producto } from "../Models/Productos/Producto";
 import {
   EliminaVehiculosPorProducto,
   InsertaVehiculosPorProducto,
 } from "./VehiculoService";
+
 
 export const GetProductos = async (
   filtro?: FiltroProducto
@@ -137,8 +139,6 @@ export const ActualizaProducto = async (Producto: ProductoCompleto) => {
               maximo=${Producto.Item!.Maximo ? Producto.Item!.Maximo : "NULL"}
             WHERE codigo = UPPER('${Producto.Item!.Codigo ?? ""}')`;
 
-  console.log("query", query);
-
   await ExecQuery(query);
 
   await InsertaVehiculosPorProducto(Producto.Item!.Codigo, Producto.Vehiculos!);
@@ -203,3 +203,174 @@ export const ActualizaPrecioProducto = async (
 
   await ExecQuery(query);
 };
+
+export const GetReporteProductos = async (
+  filtro?: FiltroReporteProducto
+): Promise<Producto[]> => {
+  let Tipo = "";
+  console.log("filtro", filtro);
+
+  if (filtro?.TipoReporte == "Exis<=0") {
+    Tipo = "and existencia <= 0";
+  }
+
+  if (filtro?.TipoReporte == "Exis<=Min") {
+    Tipo = "and existencia <= minimo";
+  }
+
+  if (filtro?.TipoReporte == "Exis>=Max") {
+    Tipo = "and existencia >= maximo";
+  }
+
+  const query = `SELECT 
+      codigo, 
+      descripcion, 
+      marcaprod, 
+      vigente, 
+      existencia, 
+      costo, 
+      precio, 
+      minimo, 
+      maximo, 
+      ubicacion
+    FROM public.productos
+    WHERE
+    vigente = true and
+    (ubicacion = '${filtro?.Ubicacion}' or 'TODOS' = '${filtro?.Ubicacion}') 
+    ${Tipo}
+    order by descripcion asc
+`;
+
+  console.log("query", query);
+
+  const lista: Producto[] = [];
+  const data = await GetCursor(query);
+  data.forEach((item) => {
+    lista.push({
+      Codigo: item.codigo,
+      Descripcion: item.descripcion,
+      MarcaProd: item.marcaprod,
+      Ubicacion: item.ubicacion,
+      Existencia: item.existencia,
+      Minimo: item.minimo,
+      Maximo: item.maximo,
+      Vigente: item.vigente,
+      Costo: item.costo,
+      Precio: item.precio,
+    });
+  });
+  return lista;
+};
+/*const FormatDate = (fecha: Date): string => {
+  const day = String(fecha.getDate()).padStart(2, "0");
+  const month = String(fecha.getMonth() + 1).padStart(2, "0"); // Los meses en JavaScript comienzan desde 0
+  const year = fecha.getFullYear();
+  const hour = fecha.getHours();
+  const minutes = fecha.getMinutes();
+  const seconds = fecha.getSeconds();
+  return `${year}${month}${day}${hour}${minutes}${seconds}`;
+};*/
+
+/*
+export const GeneraExcelReporteProductos = async (items: Producto[]) => {
+  const data = [];
+
+  const header = [
+    "Codigo",
+    "Descripcion",
+    "Existencia",
+    "Minimo",
+    "Maximo",
+    "Marca producto",
+    "Costo",
+    "Precio",
+  ];
+
+  data.push(header);
+
+  const rows = items.map((item) => {
+    return [
+      item.Codigo.toString(),
+      item.Descripcion.toString(),
+      item.Existencia.toString(),
+      item.Minimo ? item.Minimo.toString() : "",
+      item.Maximo ? item.Maximo.toString() : "",
+      item.MarcaProd ? item.MarcaProd.toString() : "",
+      item.Costo.toString(),
+      item.Precio.toString(),
+    ];
+  });
+
+  for (let i = 0; i < rows.length; i++) {
+    data.push(rows[i]);
+  }
+
+  const workBook = await .fromBlankAsync();
+
+  workBook.sheet(0).name("Reporte de Productos");
+
+  const Filename = `ReporteProductos${FormatDate(new Date())}.xlsx`;
+
+  workBook.sheet(0).range(`A1:H${data.length}`).value(data);
+
+  workBook.sheet(0).column("A").width(25);
+  workBook.sheet(0).column("B").width(75);
+  workBook.sheet(0).column("F").width(50);
+
+  
+  const directory = './public/Temp/';
+  
+  fs.readdir(directory, (err, files) => {
+    if (err) throw err;
+  
+    files.forEach(file => {
+      const filePath = path.join(directory, file);
+      fs.stat(filePath, (err, stats) => {
+        if (err) throw err;
+  
+        const now = Date.now();
+        const fileAge = (now - stats.mtimeMs) / (1000 * 60 * 60); // Convertir a horas
+  
+        if (fileAge > 1) {
+          fs.unlink(filePath, err => {
+            if (err) throw err;
+            console.log(`Archivo eliminado: ${filePath}`);
+          });
+        }
+      });
+    });
+  });
+  
+  await workBook.toFileAsync(`./public/Temp/${Filename}`);
+
+  return Filename;
+};
+*/
+
+
+export const GetCostoTotalInventario = async () =>{
+
+  const query = `SELECT SUM(EXISTENCIA * COSTO) TOTAL FROM PUBLIC.PRODUCTOS`;
+
+  const data = await GetCursor(query);
+
+  if (data.length == 0) {
+    return 0;
+  }
+  return (data[0].total) ? data[0].total : 0;
+
+}
+
+
+export const GetItemsTotalInventario = async () =>{
+
+  const query = `SELECT SUM(EXISTENCIA) TOTAL FROM PUBLIC.PRODUCTOS`;
+
+  const data = await GetCursor(query);
+
+  if (data.length == 0) {
+    return 0;
+  }
+  return (data[0].total) ? data[0].total : 0;
+
+}

@@ -3,4 +3,6 @@ export type Costo = {
     Codigo: string;
     Descripcion: string;
     Costo: number;
+    Tipo: string;
+    Fecha?: string;
   };

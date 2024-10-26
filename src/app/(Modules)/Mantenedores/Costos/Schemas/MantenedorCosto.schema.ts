@@ -1,5 +1,3 @@
-
-import { Costo } from "@/domain/Models/Costos/Costo";
 import { z } from "zod";
 
 export const MantenedorCostoSchema = z.object({
@@ -11,12 +9,11 @@ export const MantenedorCostoSchema = z.object({
     .string({ required_error: "Requerido" })
     .min(2, "Minimo 2 caracteres")
     .max(50, "Maximo 50 caracteres"),
-  Costo: z.coerce.number().positive(),
+  Costo: z.coerce
+    .number({ message: "Numero invalido" })
+    .positive({ message: "Numero invalido" }),
+  Tipo: z
+    .string({ required_error: "Requerido" })
+    .min(1, "Minimo 1 caracteres")
+    .max(50, "Maximo 50 caracteres"),
 });
-
-export const MantenedorCostoDefault: Costo = {
-  Id: "",
-  Codigo: "",
-  Descripcion: "",
-  Costo: 0
-};

@@ -4,21 +4,23 @@ import { Button } from "@/components/ui/button";
 import { ArrowUpDown, PlusIcon, Edit2Icon, Trash2Icon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
-import { GetCostoById, GetCostos } from "@/domain/Services/CostoService";
+import { EliminaCosto, GetCostoById, GetCostos } from "@/domain/Services/CostoService";
 import { FiltroCosto } from "@/domain/DTOs/Costos/FiltroCosto";
 import { Costo } from "@/domain/Models/Costos/Costo";
 import FiltrosCosto from "./Components/Filtros";
 import MantenedorCosto from "./Components/Mantenedor";
 import { TablaCosto } from "./Components/Tabla";
 import { useCodPantallaStore } from "@/app/global/Store/CodPantalla.store";
-
+import { useAdministraCostoStore } from "./Store/AdministraCosto.store";
+import { AlertaAceptarCancelar } from "@/app/global/Components/Alertas.Confirmacion";
 
 export default function CostoPage() {
-  const [date, setDate] = useState<Date | undefined>();
   const [open, setOpen] = useState(false);
   const [listaCosto, setListaCosto] = useState<Costo[]>([]);
-  const [costo, setCosto] = useState<Costo | undefined>();
+  const [costo, setCosto] = useState<Costo>();
+  const { RegistraCosto, ResetCosto } = useAdministraCostoStore();
   const { RegistraCodPantalla } = useCodPantallaStore();
+  const [confirmacion, setConfirmacion] = useState(false);
 
   useEffect(() => {
     RegistraCodPantalla({
@@ -27,37 +29,48 @@ export default function CostoPage() {
       Titulo: "Administrar Costos",
     });
     Buscar();
+    ResetCosto();
   }, []);
 
-  const Buscar = (filtro?: FiltroCosto) => {
-    GetCostos(filtro).then((result) => {
-      setListaCosto(result);
-    });
+  const Buscar = async (filtro?: FiltroCosto) => {
+    setListaCosto(await GetCostos(filtro));
   };
 
-  const ModalVisible = (flag: boolean, id?: string | undefined) => {
+  const ModalVisible = async (flag: boolean, id?: string | undefined) => {
+
     if (!flag) {
-      setCosto(undefined);
+      await RegistraCosto(undefined);
+      await Buscar();
       setOpen(flag);
-    }
-    if (id == undefined) {
-      setCosto(undefined);
+    } else if (!id) {
+      await RegistraCosto(undefined);
       setOpen(flag);
     } else {
-      GetCostoById(id).then((result) => {
-        setCosto(result);
-        setOpen(flag);
-      });
+      await RegistraCosto(await GetCostoById(id));
+      setOpen(flag);
     }
   };
 
-  const SaveDate = (fecha: Date | undefined) => {
-    setDate(fecha);
+  const ConfirmacionVisible = (flag: boolean) => {
+    setConfirmacion(flag);
+  };
+
+  const ConfirmacionAceptar = () => {
+    EliminaCosto(costo!.Id!);
+    setConfirmacion(false);
+    setCosto(undefined);
+    Buscar();
+  };
+
+  const ConfirmacionCancelar = () => {
+    setConfirmacion(false);
+    setCosto(undefined);
   };
 
   const columns: ColumnDef<Costo>[] = [
     {
       accessorKey: "Codigo",
+      id: "Codigo",
       header: ({ column }) => {
         return (
           <Button
@@ -72,6 +85,8 @@ export default function CostoPage() {
     },
     {
       accessorKey: "Descripcion",
+      size: 900,
+      id: "Descripcion",
       header: ({ column }) => {
         return (
           <Button
@@ -85,11 +100,24 @@ export default function CostoPage() {
       },
     },
     {
+      accessorKey: "Tipo",
+      id: "Tipo",
+      header: "Tipo",
+    },
+    {
       accessorKey: "Costo",
+      id: "Costo",
       header: "Costo",
     },
     {
+      accessorKey: "Fecha",
+      id: "Fecha",
+      header: "Fecha Registrado",
+    },
+    {
       header: "Acciones",
+      size: 100,
+      id: "Acciones",
       cell: ({ row }) => {
         const costo = row.original;
         return (
@@ -103,7 +131,8 @@ export default function CostoPage() {
             <Trash2Icon
               className="text-teal-600"
               onClick={() => {
-                alert(costo.Id);
+                setCosto(costo);
+                ConfirmacionVisible(true);
               }}
             />
           </div>
@@ -132,12 +161,15 @@ export default function CostoPage() {
       <div className="w-full">
         <TablaCosto columns={columns} data={listaCosto} />
       </div>
-      <MantenedorCosto
-        open={open}
-        setOpen={ModalVisible}
-        setDate={SaveDate}
-        date={date}
-        costo={costo}
+      {open ? <MantenedorCosto setOpen={ModalVisible} /> : <></>}
+      <AlertaAceptarCancelar
+        Titulo="Confirmacion"
+        Mensaje={`Confirme que desea eliminar el costo: ${costo?.Codigo}`}
+        Tipo="Confirmacion"
+        AccionAceptar={ConfirmacionAceptar}
+        AccionCancelar={ConfirmacionCancelar}
+        open={confirmacion}
+        setOpen={ConfirmacionVisible}
       />
     </main>
   );

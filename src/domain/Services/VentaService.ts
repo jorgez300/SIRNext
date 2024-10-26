@@ -9,6 +9,8 @@ import { RegistroVenta } from "../DTOs/Ventas/RegistroVenta";
 import { ActualizaExistenciaProducto } from "./ProductoService";
 import { FiltroVenta } from "../DTOs/Ventas/FiltroVenta";
 import { DetalleVenta } from "../DTOs/Ventas/DetalleVenta";
+import { DatoGraficoUnaSerie } from "../DTOs/DatoGraficoUnaSerie.dto";
+import { DatoGraficoDosSeries } from "../DTOs/DatoGraficoDosSeries.dto";
 
 export const InsertaOperacionVenta = async (
   ItemVenta: RegistroVenta[],
@@ -192,4 +194,99 @@ const ActualizaExistencia = async (registros: RegistroVenta[]) => {
   registros.forEach(async (item) => {
     await ActualizaExistenciaProducto(item.ProductoId, item.Cantidad, "+");
   });
+};
+
+export const GetTotalVentas = async (periodo: string) => {
+  const query = `select SUM(totalventa) total
+                  from public.ventas
+                  where 
+                  EXTRACT(MONTH FROM fecha) = ${periodo.split("-")[1]}  and
+                  EXTRACT(YEAR FROM fecha) = ${periodo.split("-")[0]} and
+                  ESTADO = 'VIGENTE'`;
+
+  const data = await GetCursor(query);
+
+  if (data.length == 0) {
+    return 0;
+  }
+  return data[0].total ? data[0].total : 0;
+};
+
+export const GetCantidadOperacionesVenta = async (periodo: string) => {
+  const query = `select count(*) total
+                  from public.ventas
+                  where 
+                  EXTRACT(MONTH FROM fecha) = ${periodo.split("-")[1]}  and
+                  EXTRACT(YEAR FROM fecha) = ${periodo.split("-")[0]} and
+                  ESTADO = 'VIGENTE'`;
+
+  const data = await GetCursor(query);
+
+  if (data.length == 0) {
+    return 0;
+  }
+  return data[0].total ? data[0].total : 0;
+};
+
+export const GetVentasPorDia = async (periodo: string) => {
+  const query = `select fecha,  sum (totalventa) total
+                  from 
+                  (
+                    select 
+                    TO_CHAR(fecha, 'YYYY-MM-DD') as fecha, 
+                    totalventa
+                    from public.ventas
+                    where 
+                    EXTRACT(MONTH FROM fecha) = ${periodo.split("-")[1]}  and
+                    EXTRACT(YEAR FROM fecha) = ${periodo.split("-")[0]} and
+                    ESTADO = 'VIGENTE'
+                  )
+                  group by fecha
+                  order by fecha asc`;
+
+  const data = await GetCursor(query);
+
+  if (data.length == 0) {
+    return [];
+  }
+
+  const ChartData: DatoGraficoUnaSerie[] = data.map((item) => {
+    return {
+      Fecha: item.fecha.split('-')[2],
+      ValorA: item.total,
+    };
+  });
+
+  return ChartData;
+};
+
+export const GetCostosPreciosPorDia = async (periodo: string) => {
+  const query = `select fecha,  sum (costo) costo,  sum (precio) precio
+                  from 
+                  (
+                    select TO_CHAR(fecha, 'YYYY-MM-DD') fecha, (iv.cantidad * iv.costo) costo,  (iv.cantidad * iv.precio) precio
+                    from public.ventas v 
+                    inner join public.itemventas iv on v.uid = iv.ventauid
+                    where
+                      ESTADO = 'VIGENTE' and
+                      EXTRACT(MONTH FROM fecha) = ${periodo.split("-")[1]}  and
+                      EXTRACT(YEAR FROM fecha) = ${periodo.split("-")[0]}
+                  )
+                  group by fecha`;
+
+  const data = await GetCursor(query);
+
+  if (data.length == 0) {
+    return [];
+  }
+
+  const ChartData: DatoGraficoDosSeries[] = data.map((item) => {
+    return {
+      Fecha: item.fecha.split('-')[2],
+      ValorA: item.costo,
+      ValorB: item.precio,
+    };
+  });
+
+  return ChartData;
 };
