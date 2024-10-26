@@ -28,6 +28,7 @@ import { GraficoLinealDosSeries } from "./Components/GraficoLinealDosSeries";
 import { Button } from "@/components/ui/button";
 import { toast, Toaster } from "sonner";
 import { DownloadCloud } from "lucide-react";
+import { useCodPantallaStore } from "@/app/global/Store/CodPantalla.store";
 
 export default function ResumenPage() {
   const [periodo, setPeriodo] = useState<string>();
@@ -47,8 +48,16 @@ export default function ResumenPage() {
     DatoGraficoDosSeries[]
   >([]);
 
+  const { RegistraCodPantalla } = useCodPantallaStore();
+
   useEffect(() => {
     GeneraPeriodo();
+
+    RegistraCodPantalla({
+      Codigo: "",
+      Version: "V 0.1",
+      Titulo: "Tablero resumen",
+    });
   }, []);
 
   const GeneraPeriodo = () => {
@@ -86,7 +95,6 @@ export default function ResumenPage() {
 
   const HandleSeleccionPeriodo = async (periodo: string) => {
     setPeriodo(periodo);
-    await Actualizar();
   };
 
   return (

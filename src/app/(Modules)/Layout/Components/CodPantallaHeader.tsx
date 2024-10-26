@@ -8,7 +8,7 @@ export default function CodPantallaHeader() {
   const { Pantalla } = useCodPantallaStore();
 
   return (
-    <div>
+    <div className="ml-72">
       <Label className="font-semibold">{Pantalla ? Pantalla.Titulo : ""}</Label>
       <br />
       <Label className="text-sm font-light">
