@@ -10,7 +10,6 @@ import {
   InsertaVehiculosPorProducto,
 } from "./VehiculoService";
 
-
 export const GetProductos = async (
   filtro?: FiltroProducto
 ): Promise<Producto[]> => {
@@ -208,18 +207,19 @@ export const GetReporteProductos = async (
   filtro?: FiltroReporteProducto
 ): Promise<Producto[]> => {
   let Tipo = "";
-  console.log("filtro", filtro);
 
-  if (filtro?.TipoReporte == "Exis<=0") {
-    Tipo = "and existencia <= 0";
-  }
+  if (filtro) {
+    if (filtro?.TipoReporte == "Exis<=0") {
+      Tipo = "and existencia <= 0";
+    }
 
-  if (filtro?.TipoReporte == "Exis<=Min") {
-    Tipo = "and existencia <= minimo";
-  }
+    if (filtro?.TipoReporte == "Exis<=Min") {
+      Tipo = "and existencia <= minimo";
+    }
 
-  if (filtro?.TipoReporte == "Exis>=Max") {
-    Tipo = "and existencia >= maximo";
+    if (filtro?.TipoReporte == "Exis>=Max") {
+      Tipo = "and existencia >= maximo";
+    }
   }
 
   const query = `SELECT 
@@ -241,7 +241,6 @@ export const GetReporteProductos = async (
     order by descripcion asc
 `;
 
-  console.log("query", query);
 
   const lista: Producto[] = [];
   const data = await GetCursor(query);
@@ -261,95 +260,8 @@ export const GetReporteProductos = async (
   });
   return lista;
 };
-/*const FormatDate = (fecha: Date): string => {
-  const day = String(fecha.getDate()).padStart(2, "0");
-  const month = String(fecha.getMonth() + 1).padStart(2, "0"); // Los meses en JavaScript comienzan desde 0
-  const year = fecha.getFullYear();
-  const hour = fecha.getHours();
-  const minutes = fecha.getMinutes();
-  const seconds = fecha.getSeconds();
-  return `${year}${month}${day}${hour}${minutes}${seconds}`;
-};*/
 
-/*
-export const GeneraExcelReporteProductos = async (items: Producto[]) => {
-  const data = [];
-
-  const header = [
-    "Codigo",
-    "Descripcion",
-    "Existencia",
-    "Minimo",
-    "Maximo",
-    "Marca producto",
-    "Costo",
-    "Precio",
-  ];
-
-  data.push(header);
-
-  const rows = items.map((item) => {
-    return [
-      item.Codigo.toString(),
-      item.Descripcion.toString(),
-      item.Existencia.toString(),
-      item.Minimo ? item.Minimo.toString() : "",
-      item.Maximo ? item.Maximo.toString() : "",
-      item.MarcaProd ? item.MarcaProd.toString() : "",
-      item.Costo.toString(),
-      item.Precio.toString(),
-    ];
-  });
-
-  for (let i = 0; i < rows.length; i++) {
-    data.push(rows[i]);
-  }
-
-  const workBook = await .fromBlankAsync();
-
-  workBook.sheet(0).name("Reporte de Productos");
-
-  const Filename = `ReporteProductos${FormatDate(new Date())}.xlsx`;
-
-  workBook.sheet(0).range(`A1:H${data.length}`).value(data);
-
-  workBook.sheet(0).column("A").width(25);
-  workBook.sheet(0).column("B").width(75);
-  workBook.sheet(0).column("F").width(50);
-
-  
-  const directory = './public/Temp/';
-  
-  fs.readdir(directory, (err, files) => {
-    if (err) throw err;
-  
-    files.forEach(file => {
-      const filePath = path.join(directory, file);
-      fs.stat(filePath, (err, stats) => {
-        if (err) throw err;
-  
-        const now = Date.now();
-        const fileAge = (now - stats.mtimeMs) / (1000 * 60 * 60); // Convertir a horas
-  
-        if (fileAge > 1) {
-          fs.unlink(filePath, err => {
-            if (err) throw err;
-            console.log(`Archivo eliminado: ${filePath}`);
-          });
-        }
-      });
-    });
-  });
-  
-  await workBook.toFileAsync(`./public/Temp/${Filename}`);
-
-  return Filename;
-};
-*/
-
-
-export const GetCostoTotalInventario = async () =>{
-
+export const GetCostoTotalInventario = async () => {
   const query = `SELECT SUM(EXISTENCIA * COSTO) TOTAL FROM PUBLIC.PRODUCTOS`;
 
   const data = await GetCursor(query);
@@ -357,13 +269,10 @@ export const GetCostoTotalInventario = async () =>{
   if (data.length == 0) {
     return 0;
   }
-  return (data[0].total) ? data[0].total : 0;
+  return data[0].total ? data[0].total : 0;
+};
 
-}
-
-
-export const GetItemsTotalInventario = async () =>{
-
+export const GetItemsTotalInventario = async () => {
   const query = `SELECT SUM(EXISTENCIA) TOTAL FROM PUBLIC.PRODUCTOS`;
 
   const data = await GetCursor(query);
@@ -371,6 +280,5 @@ export const GetItemsTotalInventario = async () =>{
   if (data.length == 0) {
     return 0;
   }
-  return (data[0].total) ? data[0].total : 0;
-
-}
+  return data[0].total ? data[0].total : 0;
+};

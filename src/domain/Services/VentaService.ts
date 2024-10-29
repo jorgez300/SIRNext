@@ -11,6 +11,7 @@ import { FiltroVenta } from "../DTOs/Ventas/FiltroVenta";
 import { DetalleVenta } from "../DTOs/Ventas/DetalleVenta";
 import { DatoGraficoUnaSerie } from "../DTOs/DatoGraficoUnaSerie.dto";
 import { DatoGraficoDosSeries } from "../DTOs/DatoGraficoDosSeries.dto";
+import { ObtieneIdUsuario } from "./UsuarioService";
 
 export const InsertaOperacionVenta = async (
   ItemVenta: RegistroVenta[],
@@ -21,7 +22,7 @@ export const InsertaOperacionVenta = async (
   const venta: Venta = {
     Uid: Uid,
     ClienteId: cliente.Id,
-    UsuarioId: "Admin",
+    UsuarioId: await ObtieneIdUsuario(),
     TotalArticulos: ItemVenta.reduce((accumulator, item) => {
       return accumulator + Number(item.Cantidad);
     }, 0),

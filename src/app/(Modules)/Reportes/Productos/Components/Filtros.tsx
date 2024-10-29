@@ -144,7 +144,7 @@ export default function FiltroReporteProductos(
             <SearchCheckIcon className="mr-2" />
             Consultar
           </Button>
-          <Button className="mr-2 hidden" onClick={handleExportar}>
+          <Button className="mr-2" onClick={handleExportar}>
             <Sheet className="mr-2" />
             Exportar
           </Button>
