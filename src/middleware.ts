@@ -15,7 +15,8 @@ const protectedRoutes = [
   "/Mantenedores/Costos",
   "/Mantenedores/Proveedores",
   "/Mantenedores/Usuarios",
-  "/Inicio"
+  "/Inicio",
+  "/"
 ];
 const publicRoutes = ["/Login"];
 
