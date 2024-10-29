@@ -12,12 +12,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
+import { deleteSession } from "@/domain/Helpers/SessionHelper";
 
 export default function InfoUsuario() {
   const router = useRouter();
-  function handleClickSalir() {
+  const handleClickSalir = async () => {
+    await deleteSession();
     router.push("/Login");
-  }
+  };
 
   return (
     <div className="relative ml-auto flex-1 md:grow-0">
@@ -33,9 +35,6 @@ export default function InfoUsuario() {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Informacion</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>Actualizar contrasena</DropdownMenuItem>
-          <DropdownMenuItem>Soporte</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleClickSalir}>
             Cerrar sesion

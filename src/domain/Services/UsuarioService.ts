@@ -1,6 +1,8 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { ExecQuery, GetCursor } from "../Clients/DatabaseClient";
+import { createSession, decrypt } from "../Helpers/SessionHelper";
 import { Usuario } from "../Models/Usuarios/Usuario";
 
 export const GetUsuarios = async (): Promise<Usuario[]> => {
@@ -62,4 +64,48 @@ export const InsertaUsuario = async (Usuario: Usuario) => {
   }', '${Usuario.Pass!.toUpperCase()}')`;
 
   await ExecQuery(query);
+};
+
+export const ValidaUsuario = async (
+  id: string,
+  pass: string
+): Promise<boolean | undefined> => {
+  const query = `SELECT upper(id) id, nombre, upper(rol) rol
+                  FROM public.usuario
+                  WHERE 
+                  upper(id) = '${id.toUpperCase()}' and
+                  upper(pass) = '${pass.toUpperCase()}'
+                  LIMIT 1`;
+
+  const data = await GetCursor(query);
+
+  if (data.length == 0) {
+    return false;
+  }
+
+  await createSession(data[0].id, data[0].rol);
+
+  return true;
+};
+
+export const ObtieneRolUsuario = async () => {
+  const cookie = cookies().get("session")?.value;
+
+  if (!cookie) {
+    return "";
+  }
+  const session = await decrypt(cookie);
+
+  return session!.userRol;
+};
+
+export const ObtieneIdUsuario = async () => {
+  const cookie = cookies().get("session")?.value;
+
+  if (!cookie) {
+    return "";
+  }
+  const session = await decrypt(cookie);
+
+  return session!.userId!.toString();
 };
