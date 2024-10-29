@@ -30,11 +30,7 @@ export default async function middleware(req: NextRequest) {
   const cookie = cookies().get("session")?.value;
   const session = await decrypt(cookie);
 
-  console.error('path', path)
-  console.error('cookie', cookie)
-  console.error('session', session)
-
-  /*if (isProtectedRoute && !session?.userId) {
+  if (isProtectedRoute && !session?.userId) {
     return NextResponse.redirect(new URL("/Login", req.nextUrl));
   }
 
@@ -42,5 +38,5 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/Tablero/Resumen", req.nextUrl));
   }
 
-  return NextResponse.next();*/
+  return NextResponse.next();
 }
