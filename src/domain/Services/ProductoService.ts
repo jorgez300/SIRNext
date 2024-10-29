@@ -11,6 +11,9 @@ import {
 } from "./VehiculoService";
 
 
+import { utils, writeFile } from 'xlsx';
+
+
 export const GetProductos = async (
   filtro?: FiltroProducto
 ): Promise<Producto[]> => {
@@ -261,91 +264,6 @@ export const GetReporteProductos = async (
   });
   return lista;
 };
-/*const FormatDate = (fecha: Date): string => {
-  const day = String(fecha.getDate()).padStart(2, "0");
-  const month = String(fecha.getMonth() + 1).padStart(2, "0"); // Los meses en JavaScript comienzan desde 0
-  const year = fecha.getFullYear();
-  const hour = fecha.getHours();
-  const minutes = fecha.getMinutes();
-  const seconds = fecha.getSeconds();
-  return `${year}${month}${day}${hour}${minutes}${seconds}`;
-};*/
-
-/*
-export const GeneraExcelReporteProductos = async (items: Producto[]) => {
-  const data = [];
-
-  const header = [
-    "Codigo",
-    "Descripcion",
-    "Existencia",
-    "Minimo",
-    "Maximo",
-    "Marca producto",
-    "Costo",
-    "Precio",
-  ];
-
-  data.push(header);
-
-  const rows = items.map((item) => {
-    return [
-      item.Codigo.toString(),
-      item.Descripcion.toString(),
-      item.Existencia.toString(),
-      item.Minimo ? item.Minimo.toString() : "",
-      item.Maximo ? item.Maximo.toString() : "",
-      item.MarcaProd ? item.MarcaProd.toString() : "",
-      item.Costo.toString(),
-      item.Precio.toString(),
-    ];
-  });
-
-  for (let i = 0; i < rows.length; i++) {
-    data.push(rows[i]);
-  }
-
-  const workBook = await .fromBlankAsync();
-
-  workBook.sheet(0).name("Reporte de Productos");
-
-  const Filename = `ReporteProductos${FormatDate(new Date())}.xlsx`;
-
-  workBook.sheet(0).range(`A1:H${data.length}`).value(data);
-
-  workBook.sheet(0).column("A").width(25);
-  workBook.sheet(0).column("B").width(75);
-  workBook.sheet(0).column("F").width(50);
-
-  
-  const directory = './public/Temp/';
-  
-  fs.readdir(directory, (err, files) => {
-    if (err) throw err;
-  
-    files.forEach(file => {
-      const filePath = path.join(directory, file);
-      fs.stat(filePath, (err, stats) => {
-        if (err) throw err;
-  
-        const now = Date.now();
-        const fileAge = (now - stats.mtimeMs) / (1000 * 60 * 60); // Convertir a horas
-  
-        if (fileAge > 1) {
-          fs.unlink(filePath, err => {
-            if (err) throw err;
-            console.log(`Archivo eliminado: ${filePath}`);
-          });
-        }
-      });
-    });
-  });
-  
-  await workBook.toFileAsync(`./public/Temp/${Filename}`);
-
-  return Filename;
-};
-*/
 
 
 export const GetCostoTotalInventario = async () =>{

@@ -99,3 +99,10 @@ CREATE TABLE public.costo (
     Fecha timestamp without time zone NOT NULL
 );
 
+DROP TABLE IF EXISTS public.usuario;
+CREATE TABLE Usuario (
+  Id VARCHAR(20) PRIMARY KEY,
+  Pass VARCHAR(20) NOT NULL,
+  Nombre VARCHAR(50) NOT NULL,
+  Rol VARCHAR(10) NOT NULL default 'VENDEDOR'
+);

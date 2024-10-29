@@ -11,7 +11,9 @@ import {
   Truck,
   ChartColumn,
   Hotel,
-  FileBox
+  FileBox,
+  KeyRound,
+  ReceiptCent
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -126,13 +128,20 @@ export default function RootLayout({
                     href="/Mantenedores/Costos"
                     className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                   >
-                    <Hotel className="h-5 w-5" />
+                    <ReceiptCent className="h-5 w-5" />
                     Costos
+                  </Link>
+                  <Link
+                    href="/Mantenedores/Usuarios"
+                    className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                  >
+                    <KeyRound className="h-5 w-5" />
+                    Usuarios
                   </Link>
                 </nav>
               </SheetContent>
             </Sheet>
-            <div className="grid grid-cols-12 gap-2 xxx w-full">
+            <div className="grid grid-cols-12 gap-2 w-full">
               <div className="col-span-11">
                 <CodPantallaHeader />
               </div>

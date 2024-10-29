@@ -14,6 +14,8 @@ import { FiltroReporteProducto } from "@/domain/DTOs/Productos/FiltroReporteProd
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 
+import { utils, writeFile } from 'xlsx';
+
 export default function ReporteProductoProductoPage() {
   const [listaProducto, setListaProducto] = useState<Producto[]>([]);
 
@@ -38,8 +40,14 @@ export default function ReporteProductoProductoPage() {
       });
       return;
     }
-    //const file = await GeneraExcelReporteProductos(listaProducto);
-    //window.open(`/Temp/${file}`, '_blank');
+
+    const worksheet = utils.json_to_sheet(listaProducto);
+    const workbook = utils.book_new();
+    const Filename = `ReporteProductos.xlsx`;
+  
+    utils.book_append_sheet(workbook, worksheet, "Productos");
+
+    writeFile(workbook, `${Filename}`, { compression: true });
   };
 
   const columns: ColumnDef<Producto>[] = [
