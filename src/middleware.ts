@@ -21,7 +21,7 @@ const protectedRoutes = [
 const publicRoutes = ["/Login"];
 
 export default async function middleware(req: NextRequest) {
-  /*const path = req.nextUrl.pathname;
+  const path = req.nextUrl.pathname;
   const isProtectedRoute = protectedRoutes.includes(path);
   const isPublicRoute = publicRoutes.includes(path);
 
@@ -30,7 +30,11 @@ export default async function middleware(req: NextRequest) {
   const cookie = cookies().get("session")?.value;
   const session = await decrypt(cookie);
 
-  if (isProtectedRoute && !session?.userId) {
+  console.error('path', path)
+  console.error('cookie', cookie)
+  console.error('session', session)
+
+  /*if (isProtectedRoute && !session?.userId) {
     return NextResponse.redirect(new URL("/Login", req.nextUrl));
   }
 
