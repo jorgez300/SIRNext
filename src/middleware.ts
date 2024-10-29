@@ -21,7 +21,7 @@ const protectedRoutes = [
 const publicRoutes = ["/Login"];
 
 export default async function middleware(req: NextRequest) {
-  const path = req.nextUrl.pathname;
+  /*const path = req.nextUrl.pathname;
   const isProtectedRoute = protectedRoutes.includes(path);
   const isPublicRoute = publicRoutes.includes(path);
 
@@ -38,5 +38,5 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/Tablero/Resumen", req.nextUrl));
   }
 
-  return NextResponse.next();
+  return NextResponse.next();*/
 }
