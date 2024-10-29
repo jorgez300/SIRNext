@@ -10,10 +10,6 @@ import {
   InsertaVehiculosPorProducto,
 } from "./VehiculoService";
 
-
-import { utils, writeFile } from 'xlsx';
-
-
 export const GetProductos = async (
   filtro?: FiltroProducto
 ): Promise<Producto[]> => {
@@ -211,18 +207,19 @@ export const GetReporteProductos = async (
   filtro?: FiltroReporteProducto
 ): Promise<Producto[]> => {
   let Tipo = "";
-  console.log("filtro", filtro);
 
-  if (filtro?.TipoReporte == "Exis<=0") {
-    Tipo = "and existencia <= 0";
-  }
+  if (filtro) {
+    if (filtro?.TipoReporte == "Exis<=0") {
+      Tipo = "and existencia <= 0";
+    }
 
-  if (filtro?.TipoReporte == "Exis<=Min") {
-    Tipo = "and existencia <= minimo";
-  }
+    if (filtro?.TipoReporte == "Exis<=Min") {
+      Tipo = "and existencia <= minimo";
+    }
 
-  if (filtro?.TipoReporte == "Exis>=Max") {
-    Tipo = "and existencia >= maximo";
+    if (filtro?.TipoReporte == "Exis>=Max") {
+      Tipo = "and existencia >= maximo";
+    }
   }
 
   const query = `SELECT 
@@ -244,7 +241,6 @@ export const GetReporteProductos = async (
     order by descripcion asc
 `;
 
-  console.log("query", query);
 
   const lista: Producto[] = [];
   const data = await GetCursor(query);
@@ -265,9 +261,7 @@ export const GetReporteProductos = async (
   return lista;
 };
 
-
-export const GetCostoTotalInventario = async () =>{
-
+export const GetCostoTotalInventario = async () => {
   const query = `SELECT SUM(EXISTENCIA * COSTO) TOTAL FROM PUBLIC.PRODUCTOS`;
 
   const data = await GetCursor(query);
@@ -275,13 +269,10 @@ export const GetCostoTotalInventario = async () =>{
   if (data.length == 0) {
     return 0;
   }
-  return (data[0].total) ? data[0].total : 0;
+  return data[0].total ? data[0].total : 0;
+};
 
-}
-
-
-export const GetItemsTotalInventario = async () =>{
-
+export const GetItemsTotalInventario = async () => {
   const query = `SELECT SUM(EXISTENCIA) TOTAL FROM PUBLIC.PRODUCTOS`;
 
   const data = await GetCursor(query);
@@ -289,6 +280,5 @@ export const GetItemsTotalInventario = async () =>{
   if (data.length == 0) {
     return 0;
   }
-  return (data[0].total) ? data[0].total : 0;
-
-}
+  return data[0].total ? data[0].total : 0;
+};
