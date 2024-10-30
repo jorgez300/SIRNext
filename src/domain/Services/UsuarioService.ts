@@ -51,17 +51,15 @@ export const ActualizaUsuario = async (Usuario: Usuario) => {
   const query = `UPDATE public.usuario SET 
                   nombre='${Usuario.Nombre!.toUpperCase()}', 
                   rol='${Usuario.Rol}',
-                  pass='${Usuario.Pass!.toUpperCase()}',
-                WHERE id=${Usuario.Id}`;
+                  pass='${Usuario.Pass!.toUpperCase()}'
+                WHERE id='${Usuario.Id}'`;
 
   await ExecQuery(query);
 };
 
 export const InsertaUsuario = async (Usuario: Usuario) => {
   const query = `INSERT INTO public.usuario (id, nombre, rol, pass) VALUES 
-                ('${Usuario.Id!.toUpperCase()}', '${Usuario.Nombre!.toUpperCase()}', '${
-    Usuario.Rol
-  }', '${Usuario.Pass!.toUpperCase()}')`;
+                ('${Usuario.Id!.toUpperCase()}', '${Usuario.Nombre!.toUpperCase()}', '${Usuario.Rol}', '${Usuario.Pass!.toUpperCase()}')`;
 
   await ExecQuery(query);
 };
