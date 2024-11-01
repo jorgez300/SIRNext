@@ -29,6 +29,7 @@ import { Button } from "@/components/ui/button";
 import { toast, Toaster } from "sonner";
 import { DownloadCloud } from "lucide-react";
 import { useCodPantallaStore } from "@/app/global/Store/CodPantalla.store";
+import { useLoadingStore } from "@/app/global/Store/loadingStore";
 
 export default function ResumenPage() {
   const [periodo, setPeriodo] = useState<string>();
@@ -49,6 +50,7 @@ export default function ResumenPage() {
   >([]);
 
   const { RegistraCodPantalla } = useCodPantallaStore();
+  const { showLoading, hideLoading } = useLoadingStore();
 
   useEffect(() => {
     GeneraPeriodo();
@@ -80,7 +82,7 @@ export default function ResumenPage() {
       });
       return;
     }
-
+    showLoading();
     setCostoTotalInventario(await GetCostoTotalInventario());
     setItemsTotalInventario(await GetItemsTotalInventario());
     setTotalVentas(await GetTotalVentas(periodo));
@@ -91,6 +93,8 @@ export default function ResumenPage() {
     setComprasPorDia(await GetComprasPorDia(periodo));
 
     setCostosPreciosPorDia(await GetCostosPreciosPorDia(periodo));
+
+    hideLoading();
   };
 
   const HandleSeleccionPeriodo = async (periodo: string) => {

@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { EscanerProducto } from "@/app/global/Components/Camara";
 import { useAdministraProductoStore } from "../Store/AdmistraProducto.store";
 import { useCodPantallaStore } from "@/app/global/Store/CodPantalla.store";
+import { useLoadingStore } from "@/app/global/Store/loadingStore";
 
 export default function ProductoPage() {
   const [listaModelosPorMarca, setListaModelosPorMarca] = useState<
@@ -30,7 +31,8 @@ export default function ProductoPage() {
 
   const router = useRouter();
   const { RegistraCodPantalla } = useCodPantallaStore();
-
+  const { showLoading, hideLoading } = useLoadingStore();
+  
   useEffect(() => {
     RegistraCodPantalla({
       Codigo: "",
@@ -43,7 +45,9 @@ export default function ProductoPage() {
   }, []);
 
   const Buscar = async (filtro?: FiltroProducto) => {
+    showLoading();
     setListaProducto(await GetProductos(filtro))
+    hideLoading()
   };
 
   const Listas = async () => {
