@@ -21,6 +21,13 @@ export default function InfoUsuario() {
     router.push("/Login");
   };
 
+  const handleDescargaApk = async () => {
+
+    window.open('/SirAndroid.apk', '_blank');
+
+
+  };
+
   return (
     <div className="relative ml-auto flex-1 md:grow-0">
       <DropdownMenu>
@@ -35,6 +42,9 @@ export default function InfoUsuario() {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Informacion</DropdownMenuLabel>
+          <DropdownMenuItem onClick={handleDescargaApk}>
+            SIR Android
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleClickSalir}>
             Cerrar sesion
