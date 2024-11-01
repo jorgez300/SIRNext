@@ -46,8 +46,15 @@ export const InsertaOperacionCompra = async (
       Total: item.Total,
     });
   });
+
   await ActualizaProducto(ItemCompra);
+  await sleep(2000);
+
   return await RetornaIdCompra(Uid);
+};
+
+const sleep = (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
 const InsertaCompra = async (compra: Compra) => {
@@ -183,6 +190,8 @@ export const GeneraDevolucion = async (
   registros.forEach(async (item) => {
     await ActualizaExistenciaProducto(item.ProductoId, item.Cantidad, "-");
   });
+
+  await sleep(2000);
 };
 
 const DevuelveCompra = async (item: DetalleCompra) => {
@@ -224,7 +233,7 @@ export const GetComprasPorDia = async (periodo: string) => {
   }
   const ChartData: DatoGraficoUnaSerie[] = data.map((item) => {
     return {
-      Fecha: item.fecha.split('-')[2],
+      Fecha: item.fecha.split("-")[2],
       ValorA: item.total,
     };
   });

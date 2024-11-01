@@ -27,6 +27,7 @@ import ModalProductos from "./Components/ModalProductos";
 import { Label } from "@/components/ui/label";
 import { toast, Toaster } from "sonner";
 import { useCodPantallaStore } from "@/app/global/Store/CodPantalla.store";
+import { useLoadingStore } from "@/app/global/Store/loadingStore";
 
 export default function OperacionCompraPage() {
   const [modalProductos, setModalProductos] = React.useState<boolean>(false);
@@ -38,6 +39,7 @@ export default function OperacionCompraPage() {
   const [ultimaOperacion, setUltimaOperacion] = React.useState<string>();
 
   const { RegistraCodPantalla } = useCodPantallaStore();
+  const { showLoading, hideLoading } = useLoadingStore();
 
   useEffect(() => {
     RegistraCodPantalla({
@@ -48,6 +50,8 @@ export default function OperacionCompraPage() {
   }, []);
 
   const Totalizar = async () => {
+    ConfirmaTotalizarVisible(false);
+    showLoading();
     const mensaje = [];
     if (data.length == 0) {
       mensaje.push("Seleccione productos");
@@ -68,20 +72,20 @@ export default function OperacionCompraPage() {
     }
 
     if (mensaje.length > 0) {
+      hideLoading();
       toast("Error", {
         description: mensaje.join(", "),
       });
-      ConfirmaTotalizarVisible(false);
+
       return;
     } else if (RegistrosInvalidos()) {
-      ConfirmaTotalizarVisible(false);
+      hideLoading();
       return;
     } else {
       setUltimaOperacion(await InsertaOperacionCompra(data, proveedor!));
+      hideLoading();
       Limpiar();
     }
-
-    ConfirmaTotalizarVisible(false);
   };
 
   const RegistrosInvalidos = () => {
@@ -119,7 +123,9 @@ export default function OperacionCompraPage() {
       return true;
     }
 
-    lista = data.filter((itemCompra) => Number(itemCompra.Costo) >= Number(itemCompra.Precio));
+    lista = data.filter(
+      (itemCompra) => Number(itemCompra.Costo) >= Number(itemCompra.Precio)
+    );
     if (lista.length > 0) {
       lista.forEach((itemCompra) => {
         toast("Error", {
@@ -218,11 +224,7 @@ export default function OperacionCompraPage() {
     return Total;
   };
 
-  const ActualizaCantidadItemCompra = (
-    posicion: number,
-    cantidad: number
-  ) => {
-
+  const ActualizaCantidadItemCompra = (posicion: number, cantidad: number) => {
     if (cantidad < 0) {
       cantidad = 1;
     }
@@ -371,7 +373,6 @@ export default function OperacionCompraPage() {
                         Number(e.target.value)
                       );
                     }}
-
                   ></Input>
                 </TableCell>
                 <TableCell>

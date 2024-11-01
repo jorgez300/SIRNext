@@ -24,6 +24,7 @@ import { InsertaOperacionVenta } from "@/domain/Services/VentaService";
 import { Label } from "@/components/ui/label";
 import { toast, Toaster } from "sonner";
 import { useCodPantallaStore } from "@/app/global/Store/CodPantalla.store";
+import { useLoadingStore } from "@/app/global/Store/loadingStore";
 
 export default function OperacionVentaPage() {
   const [modalProductos, setModalProductos] = React.useState<boolean>(false);
@@ -36,6 +37,8 @@ export default function OperacionVentaPage() {
 
   const { RegistraCodPantalla } = useCodPantallaStore();
 
+  const { showLoading, hideLoading } = useLoadingStore();
+
   useEffect(() => {
     RegistraCodPantalla({
       Codigo: "",
@@ -45,6 +48,9 @@ export default function OperacionVentaPage() {
   }, []);
 
   const Totalizar = async () => {
+    ConfirmaTotalizarVisible(false);
+    showLoading();
+
     const mensaje = [];
     if (data.length == 0) {
       mensaje.push("Seleccione productos");
@@ -58,19 +64,20 @@ export default function OperacionVentaPage() {
     }
 
     if (mensaje.length > 0) {
+      hideLoading();
       toast("Error", {
         description: mensaje.join(", "),
       });
+
       return;
     } else if (RegistrosInvalidos()) {
-      ConfirmaTotalizarVisible(false);
+      hideLoading();
       return;
     } else {
       setUltimaOperacion(await InsertaOperacionVenta(data, cliente!));
+      hideLoading();
       Limpiar();
     }
-
-    ConfirmaTotalizarVisible(false);
   };
 
   const RegistrosInvalidos = () => {
