@@ -46,7 +46,13 @@ export const InsertaOperacionVenta = async (
     await ActualizaExistenciaProducto(item.ProductoId, item.Cantidad, "-");
   });
 
+  await sleep(2000);
+
   return await RetornaIdVenta(Uid);
+};
+
+const sleep = (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
 const InsertaVenta = async (venta: Venta) => {
@@ -195,6 +201,8 @@ const ActualizaExistencia = async (registros: RegistroVenta[]) => {
   registros.forEach(async (item) => {
     await ActualizaExistenciaProducto(item.ProductoId, item.Cantidad, "+");
   });
+
+  await sleep(2000);
 };
 
 export const GetTotalVentas = async (periodo: string) => {
@@ -253,7 +261,7 @@ export const GetVentasPorDia = async (periodo: string) => {
 
   const ChartData: DatoGraficoUnaSerie[] = data.map((item) => {
     return {
-      Fecha: item.fecha.split('-')[2],
+      Fecha: item.fecha.split("-")[2],
       ValorA: item.total,
     };
   });
@@ -283,7 +291,7 @@ export const GetCostosPreciosPorDia = async (periodo: string) => {
 
   const ChartData: DatoGraficoDosSeries[] = data.map((item) => {
     return {
-      Fecha: item.fecha.split('-')[2],
+      Fecha: item.fecha.split("-")[2],
       ValorA: item.costo,
       ValorB: item.precio,
     };

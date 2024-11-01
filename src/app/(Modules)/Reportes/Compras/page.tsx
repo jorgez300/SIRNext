@@ -14,8 +14,6 @@ import FiltrosCompra from "./Components/Filtros";
 import { TablaCompras } from "./Components/Tabla";
 import ModalDetalleCompra from "./Components/Detalle";
 
-
-
 export default function ReporteComprasPage() {
   const [open, setOpen] = useState(false);
   const [listaCompras, setListaCompras] = useState<DetalleCompra[]>([]);

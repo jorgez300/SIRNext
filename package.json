@@ -48,6 +48,7 @@
     "react-zxing": "^2.0.2",
     "recharts": "^2.13.0-alpha.5",
     "sonner": "^1.5.0",
+    "styled-components": "^6.1.13",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.4",

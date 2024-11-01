@@ -1,5 +1,6 @@
 "use client";
 
+import { useLoadingStore } from "@/app/global/Store/loadingStore";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -33,7 +34,7 @@ type DetalleVentaProps = {
 
 export default function ModalDetalleVenta(props: Readonly<DetalleVentaProps>) {
   const [data, setData] = useState<RegistroVenta[]>([]);
-
+  const { showLoading, hideLoading } = useLoadingStore();
   useEffect(() => {
     ObtieneDetalleVenta();
   }, []);
@@ -43,11 +44,14 @@ export default function ModalDetalleVenta(props: Readonly<DetalleVentaProps>) {
   };
 
   const Devolucion = async () => {
+    showLoading();
+    props.setOpen(false);
     await GeneraDevolucion(props.ItemSeleccionado!, data);
+    hideLoading();
     toast("Devolucion", {
       description: `Devolucion generada para venta ${props.ItemSeleccionado?.Id}`,
     });
-    props.setOpen(false);
+    
   };
 
   return (
