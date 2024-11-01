@@ -10,11 +10,16 @@ import {
   InsertaVehiculosPorProducto,
 } from "./VehiculoService";
 
+const sleep = (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
+
 export const GetProductos = async (
   filtro?: FiltroProducto
 ): Promise<Producto[]> => {
   let query = ``;
-
+  await sleep(2000);
   if (filtro) {
     query = `SELECT distinct p.codigo, p.descripcion, marcaprod, p.vigente, p.existencia, p.costo, p.precio, p.minimo, p.maximo
               FROM public.productos p left join public.productosvehiculos pv on p.codigo = pv.codigo
@@ -56,6 +61,8 @@ export const GetProductos = async (
       Precio: item.precio,
     });
   });
+
+  
   return lista;
 };
 
@@ -63,7 +70,7 @@ export const GetProductosOperacion = async (
   filtro: FiltroProducto
 ): Promise<Producto[]> => {
   let query = ``;
-
+  await sleep(2000);
   query = `SELECT distinct p.codigo, p.descripcion, marcaprod, p.vigente, p.existencia, p.costo, p.precio, p.minimo, p.maximo
               FROM public.productos p left join public.productosvehiculos pv on p.codigo = pv.codigo
               WHERE 
@@ -99,12 +106,13 @@ export const GetProductosOperacion = async (
 export const GetProductoById = async (
   id: string
 ): Promise<Producto | undefined> => {
+  await sleep(2000);
   const query = `SELECT Codigo, Descripcion, marcaprod, Vigente, existencia, costo, precio, minimo, maximo , Ubicacion 
                 FROM public.productos 
                 WHERE Codigo = UPPER('${id}')`;
 
   const data = await GetCursor(query);
-
+  
   if (data.length == 0) {
     return undefined;
   }
@@ -207,7 +215,7 @@ export const GetReporteProductos = async (
   filtro?: FiltroReporteProducto
 ): Promise<Producto[]> => {
   let Tipo = "";
-
+  await sleep(2000);
   if (filtro) {
     if (filtro?.TipoReporte == "Exis<=0") {
       Tipo = "and existencia <= 0";
