@@ -59,7 +59,7 @@ const sleep = (ms: number) => {
 
 const InsertaCompra = async (compra: Compra) => {
   const query = `INSERT INTO public.Compras (Fecha, Uid, ProveedorId, UsuarioId, TotalArticulos, TotalCompra)VALUES 
-                (CURRENT_TIMESTAMP, '${compra.Uid}', ${compra.ProveedorId}, '${compra.UsuarioId}', ${compra.TotalArticulos}, ${compra.TotalCompra})`;
+                (current_timestamp AT TIME ZONE 'America/Caracas' , '${compra.Uid}', ${compra.ProveedorId}, '${compra.UsuarioId}', ${compra.TotalArticulos}, ${compra.TotalCompra})`;
 
   await ExecQuery(query);
 };
@@ -209,6 +209,39 @@ const ActualizaProducto = async (registros: RegistroCompra[]) => {
     await ActualizaPrecioProducto(item.ProductoId, Number(item.Precio));
   });
 };
+
+export const GetTotalCompras = async (periodo: string) => {
+  const query = `select SUM(totalcompra) total
+                  from public.compras
+                  where 
+                  EXTRACT(MONTH FROM fecha) = ${periodo.split("-")[1]}  and
+                  EXTRACT(YEAR FROM fecha) = ${periodo.split("-")[0]} and
+                  ESTADO = 'VIGENTE'`;
+
+  const data = await GetCursor(query);
+
+  if (data.length == 0) {
+    return 0;
+  }
+  return data[0].total ? data[0].total : 0;
+};
+
+export const GetCantidadOperacionesCompra = async (periodo: string) => {
+  const query = `select count(*) total
+                  from public.compras
+                  where 
+                  EXTRACT(MONTH FROM fecha) = ${periodo.split("-")[1]}  and
+                  EXTRACT(YEAR FROM fecha) = ${periodo.split("-")[0]} and
+                  ESTADO = 'VIGENTE'`;
+
+  const data = await GetCursor(query);
+
+  if (data.length == 0) {
+    return 0;
+  }
+  return data[0].total ? data[0].total : 0;
+};
+
 
 export const GetComprasPorDia = async (periodo: string) => {
   const query = `select fecha,  sum (totalcompra) total

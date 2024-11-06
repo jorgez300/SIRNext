@@ -106,7 +106,7 @@ export default function OperacionVentaPage() {
     }
 
     lista = data.filter(
-      (itemVenta) => itemVenta.Cantidad >= itemVenta.Existencia!
+      (itemVenta) => itemVenta.Cantidad > itemVenta.Existencia!
     );
 
     if (lista.length > 0) {

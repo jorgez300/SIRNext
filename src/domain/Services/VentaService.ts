@@ -57,7 +57,7 @@ const sleep = (ms: number) => {
 
 const InsertaVenta = async (venta: Venta) => {
   const query = `INSERT INTO public.Ventas (Fecha, Uid, ClienteId, UsuarioId, TotalArticulos, TotalVenta)VALUES 
-                (CURRENT_TIMESTAMP, '${venta.Uid}', ${venta.ClienteId}, '${venta.UsuarioId}', ${venta.TotalArticulos}, ${venta.TotalVenta})`;
+                (current_timestamp AT TIME ZONE 'America/Caracas' , '${venta.Uid}', ${venta.ClienteId}, '${venta.UsuarioId}', ${venta.TotalArticulos}, ${venta.TotalVenta})`;
 
   await ExecQuery(query);
 };

@@ -22,7 +22,11 @@ import {
 } from "@/domain/Services/VentaService";
 import { GetTotalCostos } from "@/domain/Services/CostoService";
 import { DatoGraficoUnaSerie } from "@/domain/DTOs/DatoGraficoUnaSerie.dto";
-import { GetComprasPorDia } from "@/domain/Services/CompraService";
+import {
+  GetCantidadOperacionesCompra,
+  GetComprasPorDia,
+  GetTotalCompras,
+} from "@/domain/Services/CompraService";
 import { DatoGraficoDosSeries } from "@/domain/DTOs/DatoGraficoDosSeries.dto";
 import { GraficoLinealDosSeries } from "./Components/GraficoLinealDosSeries";
 import { Button } from "@/components/ui/button";
@@ -39,6 +43,9 @@ export default function ResumenPage() {
   const [ItemsTotalInventario, setItemsTotalInventario] = useState<number>(0);
   const [TotalVentas, setTotalVentas] = useState<number>(0);
   const [CantidadOperacionesVenta, setCantidadOperacionesVenta] =
+    useState<number>(0);
+  const [TotalCompras, setTotalCompras] = useState<number>(0);
+  const [CantidadOperacionesCompra, setCantidadOperacionesCompra] =
     useState<number>(0);
   const [TotalCostos, setTotalCostos] = useState<number>(0);
 
@@ -78,7 +85,7 @@ export default function ResumenPage() {
   const Actualizar = async () => {
     if (!periodo) {
       toast("Error", {
-        description:'Seleccione un periodo',
+        description: "Seleccione un periodo",
       });
       return;
     }
@@ -87,6 +94,10 @@ export default function ResumenPage() {
     setItemsTotalInventario(await GetItemsTotalInventario());
     setTotalVentas(await GetTotalVentas(periodo));
     setCantidadOperacionesVenta(await GetCantidadOperacionesVenta(periodo));
+
+    setTotalCompras(await GetTotalCompras(periodo));
+    setCantidadOperacionesCompra(await GetCantidadOperacionesCompra(periodo));
+
     setTotalCostos(await GetTotalCostos(periodo));
 
     setVentasPorDia(await GetVentasPorDia(periodo));
@@ -144,6 +155,16 @@ export default function ResumenPage() {
           Title="Operaciones de venta"
           Value={`${CantidadOperacionesVenta}`}
           Subtitle="Cantidad de ventas realizadas en el mes"
+        />
+        <Kpi
+          Title="Total Compras"
+          Value={`$ ${TotalCompras}`}
+          Subtitle="Monto total de las compras realizadas en el mes"
+        />
+        <Kpi
+          Title="Operaciones de compra"
+          Value={`${CantidadOperacionesCompra}`}
+          Subtitle="Cantidad de compras realizadas en el mes"
         />
 
         <Kpi

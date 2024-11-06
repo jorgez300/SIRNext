@@ -1,5 +1,5 @@
 "use client";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
   Card,
   CardContent,
@@ -64,6 +64,7 @@ export function GraficoLineal(props: Readonly<GraficoLinealProps>) {
               tickMargin={8}
               tickFormatter={(value) => value.slice(0, 3)}
             />
+            <YAxis />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent indicator="line" />}
