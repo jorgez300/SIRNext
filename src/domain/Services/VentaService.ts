@@ -12,6 +12,7 @@ import { DetalleVenta } from "../DTOs/Ventas/DetalleVenta";
 import { DatoGraficoUnaSerie } from "../DTOs/DatoGraficoUnaSerie.dto";
 import { DatoGraficoDosSeries } from "../DTOs/DatoGraficoDosSeries.dto";
 import { ObtieneIdUsuario } from "./UsuarioService";
+import { GetTotalCostos } from "./CostoService";
 
 export const InsertaOperacionVenta = async (
   ItemVenta: RegistroVenta[],
@@ -294,6 +295,39 @@ export const GetCostosPreciosPorDia = async (periodo: string) => {
       Fecha: item.fecha.split("-")[2],
       ValorA: item.costo,
       ValorB: item.precio,
+    };
+  });
+
+  return ChartData;
+};
+
+export const GetGananciaCostoPorDia = async (periodo: string) => {
+  const query = `select fecha,  (sum (costo) -  sum (precio)) bruta
+                  from 
+                  (
+                    select TO_CHAR(fecha, 'YYYY-MM-DD') fecha, (iv.cantidad * iv.costo) costo,  (iv.cantidad * iv.precio) precio
+                    from public.ventas v 
+                    inner join public.itemventas iv on v.uid = iv.ventauid
+                    where
+                      ESTADO = 'VIGENTE' and
+                      EXTRACT(MONTH FROM fecha) = ${periodo.split("-")[1]}  and
+                      EXTRACT(YEAR FROM fecha) = ${periodo.split("-")[0]}
+                  )
+                  group by fecha`;
+
+  const data = await GetCursor(query);
+
+  if (data.length == 0) {
+    return [];
+  }
+
+  const costos = await GetTotalCostos(periodo);
+
+  const ChartData: DatoGraficoDosSeries[] = data.map((item) => {
+    return {
+      Fecha: item.fecha.split("-")[2],
+      ValorA: item.bruta,
+      ValorB: costos,
     };
   });
 
