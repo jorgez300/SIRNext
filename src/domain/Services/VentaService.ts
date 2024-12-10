@@ -39,7 +39,7 @@ export const InsertaOperacionVenta = async (
       ProductoId: item.ProductoId,
       Cantidad: item.Cantidad,
       Costo: item.Costo,
-      Precio: item.Precio,
+      Precio: Number(item.Precio),
       Total: item.Total,
     });
 
