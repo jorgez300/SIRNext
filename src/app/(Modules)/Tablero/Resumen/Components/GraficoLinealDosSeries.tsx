@@ -1,5 +1,5 @@
 "use client";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import {
   Card,
   CardContent,
@@ -40,6 +40,9 @@ export function GraficoLinealDosSeries(props: Readonly<GraficoLinealProps>) {
     },
   } satisfies ChartConfig;
 
+  const mayorA = Math.max(...props.chartData.map((item) => item.ValorA));
+  const mayorB = Math.max(...props.chartData.map((item) => item.ValorB));
+
   return (
     <Card>
       <CardHeader>
@@ -48,7 +51,7 @@ export function GraficoLinealDosSeries(props: Readonly<GraficoLinealProps>) {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <AreaChart
+          <LineChart
             accessibilityLayer
             data={props.chartData}
             margin={{
@@ -56,36 +59,44 @@ export function GraficoLinealDosSeries(props: Readonly<GraficoLinealProps>) {
               right: 12,
             }}
           >
-            <CartesianGrid vertical={false} />
+            <CartesianGrid vertical={true} />
+            <YAxis
+              type="number"
+              domain={[
+                0,
+                mayorA > mayorB
+                  ? Math.round(mayorA) + 100
+                  : Math.round(mayorB) + 100,
+              ]}
+              tickCount={15}
+            />
             <XAxis
               dataKey="Fecha"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
+              //tickFormatter={(value) => value.slice(0, 3)}
             />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
+              content={<ChartTooltipContent indicator="dot" />}
             />
-            <Area
+            <Line
               dataKey="ValorA"
               type="natural"
-              fill="var(--color-ValorA)"
-              fillOpacity={0.4}
               stroke="var(--color-ValorA)"
-              stackId="a"
+              strokeWidth={2}
+              dot={false}
             />
-            <Area
+            <Line
               dataKey="ValorB"
               type="natural"
-              fill="var(--color-ValorB)"
-              fillOpacity={0.4}
               stroke="var(--color-ValorB)"
-              stackId="a"
+              strokeWidth={2}
+              dot={false}
             />
             <ChartLegend content={<ChartLegendContent />} />
-          </AreaChart>
+          </LineChart>
         </ChartContainer>
       </CardContent>
       <CardFooter>

@@ -17,6 +17,7 @@ import {
 import {
   GetCantidadOperacionesVenta,
   GetCostosPreciosPorDia,
+  GetGananciaCostoPorDia,
   GetTotalVentas,
   GetVentasPorDia,
 } from "@/domain/Services/VentaService";
@@ -56,6 +57,10 @@ export default function ResumenPage() {
     DatoGraficoDosSeries[]
   >([]);
 
+  const [GananciaCostoPorDia, setGananciaCostoPorDia] = useState<
+    DatoGraficoDosSeries[]
+  >([]);
+
   const { RegistraCodPantalla } = useCodPantallaStore();
   const { showLoading, hideLoading } = useLoadingStore();
 
@@ -64,7 +69,7 @@ export default function ResumenPage() {
 
     RegistraCodPantalla({
       Codigo: "",
-      Version: "V 0.1",
+      Version: "V 1.2",
       Titulo: "Tablero resumen",
     });
   }, []);
@@ -104,6 +109,8 @@ export default function ResumenPage() {
     setComprasPorDia(await GetComprasPorDia(periodo));
 
     setCostosPreciosPorDia(await GetCostosPreciosPorDia(periodo));
+
+    setGananciaCostoPorDia(await GetGananciaCostoPorDia(periodo));
 
     hideLoading();
   };
@@ -202,6 +209,13 @@ export default function ResumenPage() {
           TituloSerieB="Venta"
           SubTitle="Detalle del costo/venta por dia dentro del periodo seleccionado"
           chartData={CostosPreciosPorDia}
+        />
+        <GraficoLinealDosSeries
+          Title="Utilidad Bruta vs Costos"
+          TituloSerieA="Ganancia"
+          TituloSerieB="Costos"
+          SubTitle="Grafico de comparacion entre utilidad bruta y costos, el valor de utilidad bruta debe ser mayor y esa deferencia refleja utilidad neta (ganancia)"
+          chartData={GananciaCostoPorDia}
         />
       </div>
       <Toaster />

@@ -68,7 +68,7 @@ export const GetCostos = async (filtro?: FiltroCosto): Promise<Costo[]> => {
       Codigo: item.codigo,
       Descripcion: item.descripcion,
       Costo: item.costo,
-      Tipo: (item.tipo == 'R') ? 'Recurrente' : 'Unico',
+      Tipo: item.tipo == "R" ? "Recurrente" : "Unico",
       Fecha: item.fecha,
     });
   });
@@ -137,12 +137,16 @@ export const GetTotalCostos = async (periodo: string) => {
   const query = `select sum(costo) total
                   from public.costo
                   where 
-                  (EXTRACT(MONTH FROM fecha) = ${periodo.split("-")[1]}  and EXTRACT(YEAR FROM fecha) = ${periodo.split("-")[0]}) OR tipo = 'R'`;
+                  (EXTRACT(MONTH FROM fecha) = ${
+                    periodo.split("-")[1]
+                  }  and EXTRACT(YEAR FROM fecha) = ${
+    periodo.split("-")[0]
+  }) OR tipo = 'R'`;
 
   const data = await GetCursor(query);
 
   if (data.length == 0) {
     return 0;
   }
-  return (data[0].total) ? data[0].total : 0;
+  return data[0].total ? data[0].total : 0;
 };
