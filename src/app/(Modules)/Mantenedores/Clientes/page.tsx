@@ -26,7 +26,7 @@ export default function ClientesPage() {
   useEffect(() => {
     RegistraCodPantalla({
       Codigo: "",
-      Version: "V 0.1",
+      Version: "V 1.0",
       Titulo: "Administrar Clientes",
     });
     Buscar();

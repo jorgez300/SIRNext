@@ -25,7 +25,7 @@ export default function CostoPage() {
   useEffect(() => {
     RegistraCodPantalla({
       Codigo: "",
-      Version: "V 0.1",
+      Version: "V 1.0",
       Titulo: "Administrar Costos",
     });
     Buscar();

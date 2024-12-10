@@ -24,7 +24,7 @@ export default function ReporteProductoProductoPage() {
   useEffect(() => {
     RegistraCodPantalla({
       Codigo: "",
-      Version: "V 0.1",
+      Version: "V 1.0",
       Titulo: "Reporte de productos",
     });
   }, []);

@@ -42,7 +42,7 @@ export default function OperacionVentaPage() {
   useEffect(() => {
     RegistraCodPantalla({
       Codigo: "",
-      Version: "V 0.1",
+      Version: "V 1.1",
       Titulo: "Operacion de venta",
     });
   }, []);
@@ -117,6 +117,20 @@ export default function OperacionVentaPage() {
       });
       return true;
     }
+
+    lista = data.filter(
+      (itemVenta) => itemVenta.Costo > Number(itemVenta.Precio)
+    );
+
+    if (lista.length > 0) {
+      lista.forEach((itemVenta) => {
+        toast("Error", {
+          description: `Precio de venta menos al costo en producto: ${itemVenta.ProductoId}`,
+        });
+      });
+      return true;
+    }
+
 
     return false;
   };
@@ -224,7 +238,20 @@ export default function OperacionVentaPage() {
     const nlista: RegistroVenta[] = lista.filter((item) => item.Posicion >= 0);
     nlista[posicion].Cantidad = cantidad;
     nlista[posicion].Total =
-      nlista[posicion].Precio * nlista[posicion].Cantidad;
+    Number(nlista[posicion].Precio) * nlista[posicion].Cantidad;
+
+    OrdenaPosicion(nlista);
+  };
+
+  const ActualizaPrecioItemVenta = (
+    posicion: number,
+    precio: number | string
+  ) => {
+    const lista = data;
+    const nlista: RegistroVenta[] = lista.filter((item) => item.Posicion >= 0);
+    nlista[posicion].Precio = precio;
+    nlista[posicion].Total =
+      Number(nlista[posicion].Precio) * nlista[posicion].Cantidad;
 
     OrdenaPosicion(nlista);
   };
@@ -344,8 +371,22 @@ export default function OperacionVentaPage() {
                     }}
                   ></Input>
                 </TableCell>
-                <TableCell className="text-center">
-                  {itemVenta.Precio}
+                <TableCell className="text-center w-[200px]">
+                <Input
+                    maxLength={10}
+                    type="text"
+                    className="w-full"
+                    lang="en"
+                    value={itemVenta.Precio == 0 ? "" : itemVenta.Precio}
+                    onChange={(e) => {
+                      if (!isNaN(Number(e.target.value))) {
+                        ActualizaPrecioItemVenta(
+                          itemVenta.Posicion,
+                          e.target.value
+                        );
+                      }
+                    }}
+                  ></Input>
                 </TableCell>
                 <TableCell className="text-center">{itemVenta.Total}</TableCell>
               </TableRow>

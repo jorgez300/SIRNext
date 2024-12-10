@@ -79,7 +79,7 @@ export default function MantenedorProductoPage() {
   useEffect(() => {
     RegistraCodPantalla({
       Codigo: "",
-      Version: "V 0.1",
+      Version: "V 1.0",
       Titulo: "Administrar productos",
     });
     Listas();
