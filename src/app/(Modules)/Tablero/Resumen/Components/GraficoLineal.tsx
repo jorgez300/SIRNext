@@ -1,5 +1,13 @@
 "use client";
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  Line,
+  LineChart,
+  XAxis,
+  YAxis,
+} from "recharts";
 import {
   Card,
   CardContent,
@@ -18,9 +26,6 @@ import {
 } from "@/components/ui/chart";
 import { DatoGraficoUnaSerie } from "@/domain/DTOs/DatoGraficoUnaSerie.dto";
 
-
-
-
 type GraficoLinealProps = {
   Title: string;
   SubTitle?: string;
@@ -31,14 +36,14 @@ type GraficoLinealProps = {
 };
 
 export function GraficoLineal(props: Readonly<GraficoLinealProps>) {
-
   const chartConfig = {
     ValorA: {
       label: props.TituloSerieA,
       color: "hsl(var(--chart-2))",
-    }
+    },
   } satisfies ChartConfig;
 
+  const mayorA = Math.max(...props.chartData.map((item) => item.ValorA));
 
   return (
     <Card>
@@ -48,7 +53,7 @@ export function GraficoLineal(props: Readonly<GraficoLinealProps>) {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <AreaChart
+          <LineChart
             accessibilityLayer
             data={props.chartData}
             margin={{
@@ -56,7 +61,8 @@ export function GraficoLineal(props: Readonly<GraficoLinealProps>) {
               right: 12,
             }}
           >
-            <CartesianGrid vertical={false} />
+            <CartesianGrid vertical={true} />
+            <YAxis type="number" domain={[0, Math.round(mayorA) + 100]} tickCount={15} />
             <XAxis
               dataKey="Fecha"
               tickLine={false}
@@ -67,18 +73,17 @@ export function GraficoLineal(props: Readonly<GraficoLinealProps>) {
             <YAxis />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
+              content={<ChartTooltipContent indicator="dot" />}
             />
-            <Area
+            <Line
               dataKey="ValorA"
               type="natural"
-              fill="var(--color-ValorA)"
-              fillOpacity={0.4}
               stroke="var(--color-ValorA)"
-              stackId="a"
+              strokeWidth={2}
+              dot={false}
             />
             <ChartLegend content={<ChartLegendContent />} />
-          </AreaChart>
+          </LineChart>
         </ChartContainer>
       </CardContent>
       <CardFooter>
@@ -88,7 +93,7 @@ export function GraficoLineal(props: Readonly<GraficoLinealProps>) {
               {props.Info ?? ""}
             </div>
             <div className="flex items-center gap-2 leading-none text-muted-foreground">
-            {props.Period ?? ""}
+              {props.Period ?? ""}
             </div>
           </div>
         </div>

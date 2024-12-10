@@ -302,7 +302,7 @@ export const GetCostosPreciosPorDia = async (periodo: string) => {
 };
 
 export const GetGananciaCostoPorDia = async (periodo: string) => {
-  const query = `select fecha,  (sum (precio) -sum (costo)) bruta
+  const query = `select fecha,  sum (costo) costo,  sum (precio) precio
                   from 
                   (
                     select TO_CHAR(fecha, 'YYYY-MM-DD') fecha, (iv.cantidad * iv.costo) costo,  (iv.cantidad * iv.precio) precio
@@ -323,10 +323,15 @@ export const GetGananciaCostoPorDia = async (periodo: string) => {
 
   const costos = await GetTotalCostos(periodo);
 
+  let sumatoria = 0;
+
   const ChartData: DatoGraficoDosSeries[] = data.map((item) => {
+
+    sumatoria += (item.precio - item.costo)
+
     return {
       Fecha: item.fecha.split("-")[2],
-      ValorA: item.bruta,
+      ValorA: sumatoria,
       ValorB: costos,
     };
   });

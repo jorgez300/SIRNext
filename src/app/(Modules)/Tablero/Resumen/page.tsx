@@ -69,7 +69,7 @@ export default function ResumenPage() {
 
     RegistraCodPantalla({
       Codigo: "",
-      Version: "V 1.1",
+      Version: "V 1.2",
       Titulo: "Tablero resumen",
     });
   }, []);
