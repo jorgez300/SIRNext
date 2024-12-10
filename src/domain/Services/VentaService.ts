@@ -302,7 +302,7 @@ export const GetCostosPreciosPorDia = async (periodo: string) => {
 };
 
 export const GetGananciaCostoPorDia = async (periodo: string) => {
-  const query = `select fecha,  (sum (costo) -  sum (precio)) bruta
+  const query = `select fecha,  (sum (precio) -sum (costo)) bruta
                   from 
                   (
                     select TO_CHAR(fecha, 'YYYY-MM-DD') fecha, (iv.cantidad * iv.costo) costo,  (iv.cantidad * iv.precio) precio
