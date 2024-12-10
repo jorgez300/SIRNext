@@ -1,7 +1,5 @@
 "use client";
 import {
-  Area,
-  AreaChart,
   CartesianGrid,
   Line,
   LineChart,
@@ -62,7 +60,11 @@ export function GraficoLineal(props: Readonly<GraficoLinealProps>) {
             }}
           >
             <CartesianGrid vertical={true} />
-            <YAxis type="number" domain={[0, Math.round(mayorA) + 100]} tickCount={15} />
+            <YAxis
+              type="number"
+              domain={[0, Math.round(mayorA) + 100]}
+              tickCount={15}
+            />
             <XAxis
               dataKey="Fecha"
               tickLine={false}
