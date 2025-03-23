@@ -94,6 +94,11 @@ export default function ProductoPage() {
       header: "Existencia",
     },
     {
+      accessorKey: "Ubicacion",
+      size: 100,
+      header: "Ubicacion",
+    },
+    {
       accessorKey: "MarcaProd",
       header: "Marca producto",
     },

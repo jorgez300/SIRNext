@@ -21,7 +21,7 @@ export const GetProductos = async (
   let query = ``;
   await sleep(2000);
   if (filtro) {
-    query = `SELECT distinct p.codigo, p.descripcion, marcaprod, p.vigente, p.existencia, p.costo, p.precio, p.minimo, p.maximo
+    query = `SELECT distinct p.codigo, p.descripcion, marcaprod, p.vigente, p.existencia, p.costo, p.precio, p.minimo, p.maximo, p.ubicacion
               FROM public.productos p left join public.productosvehiculos pv on p.codigo = pv.codigo
               WHERE 
                 ( UPPER(p.codigo) like '%${
@@ -43,7 +43,7 @@ export const GetProductos = async (
               ORDER BY p.descripcion ASC
               LIMIT 100`;
   } else {
-    query = `SELECT Codigo, Descripcion, marcaprod, Vigente, existencia, costo, precio, minimo, maximo 
+    query = `SELECT Codigo, Descripcion, marcaprod, Vigente, existencia, costo, precio, minimo, maximo, ubicacion
             FROM public.productos P 
             ORDER BY P.descripcion ASC
             LIMIT 100`;
@@ -59,6 +59,7 @@ export const GetProductos = async (
       Vigente: item.vigente,
       Costo: item.costo,
       Precio: item.precio,
+      Ubicacion: item.ubicacion,
     });
   });
 
