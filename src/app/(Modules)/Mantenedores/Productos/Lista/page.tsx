@@ -36,7 +36,7 @@ export default function ProductoPage() {
   useEffect(() => {
     RegistraCodPantalla({
       Codigo: "",
-      Version: "V 1.0",
+      Version: "V 1.1",
       Titulo: "Listado de productos",
     });
     ResetCodigo();

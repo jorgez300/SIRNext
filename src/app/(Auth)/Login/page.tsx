@@ -13,7 +13,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import React from "react";
+import React, { useEffect } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -32,8 +32,7 @@ export default function LoginPage() {
       if (form.formState.isValid) {
         if (await ValidaUsuario(form.getValues("Id"), form.getValues("Pass"))) {
           router.push("/Tablero/Resumen");
-        }
-        else{
+        } else {
           toast("Error", {
             description: `Datos de usuario no validos`,
           });
@@ -41,6 +40,12 @@ export default function LoginPage() {
       }
     });
   };
+
+  useEffect(() => {
+    toast("Error", {
+      description: `Licencia expira el 08-08-2025, por favor contacte a su proveedor al correo ing.jorge.gonzalez92@gmail.com o al telefono +58 424 813 8661`,
+    });
+  }, []);
 
   const LoginDefault = {
     Id: "",
