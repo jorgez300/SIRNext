@@ -73,9 +73,9 @@ export default function ResumenPage() {
       Titulo: "Tablero resumen",
     });
 
-    toast("Error", {
+    /*toast("Error", {
       description: `Licencia expira el 08-08-2025, por favor contacte a su proveedor al correo ing.jorge.gonzalez92@gmail.com o al telefono +58 424 813 8661`,
-    });
+    });*/
   }, []);
 
   const GeneraPeriodo = () => {
