@@ -16,7 +16,7 @@ const pool = new pg.Pool({
 });
 
 export const GetCursor = async (query: string) => {
-  const fechaLimite = new Date(2025, 7, 8); // Mes 7 = agosto (0-indexed)
+  const fechaLimite = new Date(2026, 7, 1); // Mes 7 = agosto (0-indexed)
   const fechaActual = new Date();
 
   if (fechaActual <= fechaLimite) {
@@ -29,7 +29,7 @@ export const GetCursor = async (query: string) => {
 };
 
 export const ExecQuery = async (query: string) => {
-  const fechaLimite = new Date(2025, 7, 8); // Mes 7 = agosto (0-indexed)
+  const fechaLimite = new Date(2026, 7, 1); // Mes 7 = agosto (0-indexed)
   const fechaActual = new Date();
   if (fechaActual <= fechaLimite) {
     await pool.query(query);
